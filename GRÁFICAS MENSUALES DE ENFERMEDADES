@@ -1,0 +1,253 @@
+###CÓDIGO PARA GENERAR LAS GRÁFICAS MENSUALES DE ENFERMEDADES
+
+# Instalar paquetes si no están instalados
+install.packages(c("tidyverse", "lubridate", "readxl"))  # Si usas Excel
+
+# Cargar paquetes
+library(tidyverse)
+library(lubridate)
+library(readxl)  
+
+# Leer archivo CSV
+df <- read_csv("~/Downloads/panel_diario.csv")
+
+# Convertir la columna fecha a formato Date
+df <- df %>%
+  mutate(fecha = as.Date(fecha),
+         anio = year(fecha),
+         mes = month(fecha, label = TRUE, abbr = TRUE))  # Ej. "Jan", "Feb"
+
+# Agrupar por año y mes y sumar las columnas deseadas
+resumen_mensual <- df %>%
+  group_by(anio, mes) %>%
+  summarise(across(c(J029, J189, J209, J441, J459), sum), .groups = "drop")
+
+# Convertir a formato largo para ggplot
+resumen_largo <- resumen_mensual %>%
+  pivot_longer(cols = c(J029, J189, J209, J441, J459),
+               names_to = "Codigo",
+               values_to = "Total")
+
+# Min-max normalization por variable (Código)
+resumen_largo_norm <- resumen_largo %>%
+  group_by(Codigo) %>%
+  mutate(valor_norm = (Total - min(Total)) / (max(Total) - min(Total))) %>%
+  ungroup()
+
+
+# Reemplazar códigos por nombres de enfermedades
+resumen_largo_norm <- resumen_largo_norm %>%
+  mutate(Enfermedad = recode(Codigo,
+                             "J029" = "Faringitis aguda",
+                             "J189" = "Neumonía",
+                             "J209" = "Bronquitis",
+                             "J441" = "Enfisema",
+                             "J459" = "Asma"))
+
+ggplot(resumen_largo_norm, aes(x = mes, y = valor_norm, color = Enfermedad, group = Enfermedad)) +
+  geom_line(size = 0.5) +
+  facet_wrap(~ anio, ncol = 1) +
+  scale_y_continuous(limits = c(0, 1)) +
+  labs(title = "Promedio mensual normalizado por enfermedad respiratoria",
+       x = "Mes",
+       y = "Valor normalizado (0–1)",
+       color = "Enfermedad") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "right",
+        strip.text = element_text(face = "bold", size = 12),
+        plot.title = element_text(hjust = 0.5, face = "bold")) +
+  scale_color_brewer(palette = "Set1")
+
+
+ggsave("grafica_enfermedades.png", width = 10, height = 8, dpi = 300)
+
+
+
+
+
+
+###CÓDIGO PARA GENERAR LAS GRÁFICAS MENSUALES DE VARIABLES AMBIENTALES
+
+library(dplyr)
+library(lubridate)
+
+promedios_mensuales <- promedios_por_fechaytotalestaciones %>%
+  mutate(mes = floor_date(fecha, "month")) %>%
+  group_by(anio, mes, contaminante) %>%
+  summarize(promedio_mensual = mean(valor_promedio_total, na.rm = TRUE), .groups = "drop")
+
+# Ver resultados
+head(promedios_mensuales)
+
+write_csv(promedios_mensuales, "resultados/promedio_mensual")
+
+library(dplyr)
+
+promedios_mensuales_normalizados <- promedios_mensuales %>%
+  group_by(contaminante) %>%
+  mutate(valor_normalizado = (promedio_mensual - min(promedio_mensual)) / 
+           (max(promedio_mensual) - min(promedio_mensual)))
+
+
+ggplot(promedios_mensuales_normalizados, aes(x = mes, y = valor_normalizado, color = contaminante, group = contaminante)) +
+  geom_line() +
+  facet_wrap(~ anio, scales = "free_x", nrow = 5) +
+  labs(
+    title = "Promedio mensual normalizado por variable ambiental",
+    x = "Mes",
+    y = "Valor normalizado (0-1)"
+  ) +
+  scale_color_manual(
+    name = "Variable atmosférica",  # Título personalizado
+    values = c(
+      "PM10" = "orange",
+      "PM25" = "green",
+      "NO2" = "purple",
+      "TMP" = "red",
+      "RH" = "blue"
+    )
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggsave("resultados/grafico_normalizado.png", width = 10, height = 6, dpi = 300)
+
+
+
+#CALCULAR LOS PROMEDIOS DIARIOS DE VARIABLES AMBIENTALES  Y HACER GRÁFICAS
+
+# Nueva función para leer y calcular promedio diario por estacion individual
+leer_contaminante_diario <- function(anio, tipo, estaciones_col) {
+  read_excel(paste0("datos/", anio, tipo, ".xls")) %>%
+    clean_names() %>%
+    pivot_longer(cols = {{ estaciones_col }}, names_to = "clave", values_to = "valor") %>%
+    mutate(
+      clave = str_to_upper(clave),
+      fecha = as.Date(fecha),  # Asegúrate de tener columna 'fecha'
+      valor = if_else(valor == -99, NA_real_, valor)
+    ) %>%
+    group_by(clave, fecha) %>%
+    summarize(valor_promedio = mean(valor, na.rm = TRUE), .groups = "drop") %>%
+    mutate(contaminante = tipo, anio = anio)
+}
+
+#############
+
+# Aplicar para todos los años
+lista_PM10 <- map(anios, ~leer_contaminante_diario(.x, "PM10", aco:xal))
+lista_NO2  <- map(anios, ~leer_contaminante_diario(.x, "NO2",  aco:xal))
+lista_PM25 <- map(anios, ~leer_contaminante_diario(.x, "PM25", ajm:xal))
+lista_TMP <- map(anios, ~leer_contaminante_diario(.x, "TMP", ajm:xal))
+lista_RH <- map(anios, ~leer_contaminante_diario(.x, "RH", ajm:xal))
+
+# Unir todos los años y contaminantes
+PM10_diario <- bind_rows(lista_PM10)
+NO2_diario  <- bind_rows(lista_NO2)
+PM25_diario <- bind_rows(lista_PM25)
+TMP_diario <- bind_rows(lista_TMP)
+RH_diario <- bind_rows(lista_RH)
+
+# Juntar todos en un solo dataframe
+contaminantes_diarios <- bind_rows(PM10_diario, NO2_diario, PM25_diario, TMP_diario, RH_diario)
+
+# Revisar
+print(head(contaminantes_estaciones))
+
+
+write_csv(contaminantes_diarios, "resultados/contaminantes_diarios.csv")
+
+
+
+################################
+#HACER GRÁFICAS DE TODAS LAS VARIABLES POR DÍA SEPARADAS POR AÑO 
+
+
+library(ggplot2)
+library(dplyr)
+library(patchwork)
+
+# PM10
+PM10_plot_data <- contaminantes_diarios %>% filter(contaminante == "PM10")
+p_PM10 <- ggplot(PM10_plot_data, aes(x = fecha, y = valor_promedio)) +
+  stat_summary(fun = mean, geom = "line", color = "orange", size = 0.1) +
+  facet_wrap(~ anio, scales = "free_x", nrow = 1) +
+  scale_x_date(
+    date_breaks = "1 month",  # Mostrar todos los meses
+    date_labels = "%b"        # Etiqueta abreviada (Jan, Feb, etc.)
+  ) +
+  labs(
+    title = "A) Promedio diario de PM10 por año",
+    x = "Mes",
+    y = "µg/m³"
+  )  +
+  theme_minimal(base_size = 8)
+
+# PM25
+PM25_plot_data <- contaminantes_diarios %>% filter(contaminante == "PM25")
+p_PM25 <- ggplot(PM25_plot_data, aes(x = fecha, y = valor_promedio)) +
+  stat_summary(fun = mean, geom = "line", color = "green", size = 0.1) +
+  facet_wrap(~ anio, scales = "free_x", nrow = 1) +
+  scale_x_date(
+    date_breaks = "1 month",  # Mostrar todos los meses
+    date_labels = "%b"        # Etiqueta abreviada (Jan, Feb, etc.)
+  ) +
+  labs(
+    title = "B) Promedio diario de PM2.5 por año",
+    x = "Mes",
+    y = "µg/m³"
+  )  +
+  theme_minimal(base_size = 8)
+
+
+# NO2
+NO2_plot_data <- contaminantes_diarios %>% filter(contaminante == "NO2")
+p_NO2 <- ggplot(NO2_plot_data, aes(x = fecha, y = valor_promedio)) +
+  stat_summary(fun = mean, geom = "line", color = "purple", size = 0.1) +
+  facet_wrap(~ anio, scales = "free_x", nrow = 1) +
+  scale_x_date(
+    date_breaks = "1 month",  # Mostrar todos los meses
+    date_labels = "%b"        # Etiqueta abreviada (Jan, Feb, etc.)
+  ) +
+  labs(
+    title = "C) Promedio diario de NO2 por año",
+    x = "Mes",
+    y = "ppb"
+  )  +
+  theme_minimal(base_size = 8)
+
+
+
+# TMP
+TMP_plot_data <- contaminantes_diarios %>% filter(contaminante == "TMP")
+p_TMP <- ggplot(TMP_plot_data, aes(x = fecha, y = valor_promedio)) +
+  stat_summary(fun = mean, geom = "line", color = "red", size = 0.1) +
+  facet_wrap(~ anio, scales = "free_x", nrow = 1) +
+  scale_x_date(
+    date_breaks = "1 month",  # Mostrar todos los meses
+    date_labels = "%b"        # Etiqueta abreviada (Jan, Feb, etc.)
+  ) +
+  labs(
+    title = "D) Promedio diario de TMP por año",
+    x = "Mes",
+    y = "°C"
+  ) +
+  theme_minimal(base_size = 8)
+
+# RH
+RH_plot_data <- contaminantes_diarios %>% filter(contaminante == "RH")
+p_RH <- ggplot(RH_plot_data, aes(x = fecha, y = valor_promedio)) +
+  stat_summary(fun = mean, geom = "line", color = "blue", size = 0.1) +
+  facet_wrap(~ anio, scales = "free_x", nrow = 1) +
+  scale_x_date(
+    date_breaks = "1 month",  # Mostrar todos los meses
+    date_labels = "%b"        # Etiqueta abreviada (Jan, Feb, etc.)
+  ) +
+  labs(
+    title = "E) Promedio diario de RH por año",
+    x = "Mes",
+    y = "%"
+  )  +
+  theme_minimal(base_size = 8)
+
+combined_plot <- p_PM10 / p_PM25 / p_NO2 / p_TMP / p_RH
+combined_plot
