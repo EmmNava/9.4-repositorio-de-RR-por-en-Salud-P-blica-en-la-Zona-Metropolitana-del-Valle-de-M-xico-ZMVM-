@@ -1,0 +1,336 @@
+library(dplyr)
+library(sf)
+library(readr)
+library(stringr)
+library(ggplot2)
+setwd('ruta**')
+
+# Años disponibles
+anios <- 2018:2022
+
+# Inicializamos lista
+edomex_list <- list()
+
+# Vector SCIAN de interés
+scian_contaminantes <- c("3271", "3273", "3275", "3279", "313", "2121", "2123",
+                         "3312", "3313", "3251", "3252", "3255", "3253", "2211",
+                         "4811", "4831", "4884", "3241", "3116", "3311", "3315", "5629")
+
+edomex_list <- list()
+
+for (anio in 2018:2022) {
+  file1 <- paste0("edomex_1_", anio, ".csv")
+  file2 <- paste0("edomex_2_", anio, ".csv")
+  
+  if (!file.exists(file1) | !file.exists(file2)) {
+    message("Falta archivo para el año ", anio, ". Saltando...")
+    next
+  }
+  
+  message("Procesando año: ", anio)
+  
+  df1 <- read_csv(file1, show_col_types = FALSE) %>%
+    mutate(across(everything(), as.character))
+  
+  df2 <- read_csv(file2, show_col_types = FALSE) %>%
+    mutate(across(everything(), as.character))
+  
+  unido <- bind_rows(df1, df2) %>%
+    mutate(
+      año = anio,
+      cve_ent = str_pad(cve_ent, 2, pad = "0"),
+      cve_mun = str_pad(cve_mun, 3, pad = "0"),
+      cvegeo = paste0(cve_ent, cve_mun)
+    )
+  
+  unido_filtrado <- unido %>%
+    filter(str_sub(codigo_act, 1, 4) %in% scian_contaminantes) %>%
+    group_by(cvegeo, año) %>%
+    summarise(num_establecimientos = n(), .groups = "drop")
+  
+  edomex_list[[as.character(anio)]] <- unido_filtrado
+}
+
+edomex_panel <- bind_rows(edomex_list)
+
+table(edomex_panel$año)
+
+
+
+# Vector de claves de municipios relevantes (ejemplo)
+municipios_interes <- c("15002", "15070", "15011", "15013", "15020", "15025", "15031", "15033",
+                        "15037", "15039", "15057", "15058", "15104", "15109", "15121", "15122",
+                        "15099", "15100", "15028", "15029", "15030", "15108")  
+
+edomex_panel_filtrado <- edomex_panel %>%
+  filter(cvegeo %in% municipios_interes)
+
+
+#######################################################################
+
+#Filtrar CDMX
+
+library(dplyr)
+library(readr)
+library(stringr)
+
+setwd('ruta**')
+
+cdmx_list <- list()
+anios <- 2018:2022
+
+for (anio in 2018:2022) {
+  file <- paste0("cdmx", anio, ".csv")
+  
+  if (!file.exists(file)) {
+    message("Falta archivo para el año ", anio, ". Saltando...")
+    next
+  }
+  
+  message("Procesando año: ", anio)
+  
+  df <- read_csv(file, show_col_types = FALSE) %>%
+    mutate(across(everything(), as.character))
+  
+  df <- df %>%
+    mutate(
+      año = anio,
+      cve_ent = str_pad(cve_ent, 2, pad = "0"),
+      cve_mun = str_pad(cve_mun, 3, pad = "0"),
+      cvegeo = paste0(cve_ent, cve_mun)
+    )
+  
+  df_filtrado <- df %>%
+    filter(str_sub(codigo_act, 1, 4) %in% scian_contaminantes) %>%
+    group_by(cvegeo, año) %>%
+    summarise(num_establecimientos = n(), .groups = "drop")
+  
+  cdmx_list[[as.character(anio)]] <- df_filtrado
+}
+
+cdmx_panel <- bind_rows(cdmx_list)
+
+
+###############################################################
+#unir tabla:
+
+zona_metropolitana <- bind_rows(edomex_panel_filtrado, cdmx_panel) %>%
+  rename(fecha = año)
+
+
+str(zona_metropolitana)
+table(zona_metropolitana$fecha)
+unique(zona_metropolitana$cvegeo)
+
+
+##################################################################
+
+setwd('ruta**')
+
+write_csv(zona_metropolitana, "zona_metropolitana_industria.csv")
+
+panel_zmvm <- read_csv("panel_marg_cont.csv")
+
+# para unir con la tabla general:
+panel_completo <- panel_zmvm %>%
+  left_join(zona_metropolitana, by = c("cvegeo", "fecha"))
+
+glimpse(panel_completo)
+summary(panel_completo)
+
+write.csv(panel_completo, "panel_completo.csv", row.names = FALSE)
+
+###########################################################################
+#Densidad de establecimientos industriales contaminantes:
+#incorporar el efecto de la concentración relativa de industrias respecto a la población o superficie del municipio.
+#####################################################################################
+
+panel_completo <- panel_completo %>%
+  mutate(densidad_industrial = num_establecimientos / POB_MIT_MUN * 10000) # densidad por 10,000 hab
+
+########################################################################################
+# Índice compuesto o clasificación ordinal
+################################################
+
+panel_completo <- panel_completo %>%
+  mutate(clasif_industrial = case_when(
+    num_establecimientos == 0 ~ "Sin industria",
+    num_establecimientos <= 30 ~ "Baja",
+    num_establecimientos <= 100 ~ "Media",
+    TRUE ~ "Alta"
+  ))
+
+glimpse(panel_completo)
+summary(panel_completo)
+
+# Renombrar la columna 'POB_MIT_MUN' a 'POB'
+names(panel_completo)[names(panel_completo) == "POB_MIT_MUN"] <- "POB"
+
+# Asegurar que las columnas J029, J189, J209, J441, J459 estén como numéricas
+cols_enfermedades <- c("J029", "J189", "J209", "J441", "J459")
+panel_completo[cols_enfermedades] <- lapply(panel_completo[cols_enfermedades], as.numeric)
+
+# Crear la nueva columna 'cases' sumando las enfermedades por fila
+panel_completo$cases <- rowSums(panel_completo[cols_enfermedades], na.rm = TRUE)
+
+# Verificar que todo esté correcto
+str(data[, c("POB", "cases")])
+head(data[, c("cvegeo", "fecha", "POB", "cases")])
+
+write.csv(panel_completo, "panel_completo.csv", row.names = FALSE)
+#########################################################################
+setwd('ruta**')
+panel <- read.csv('panel_completo.csv')
+head(panel)
+shapefile <- st_read('recorte_zmvm.shp')
+
+###########################################################
+#Preparación de los datos
+
+library(sf)
+library(dplyr)
+library(stringr)
+
+# 1. Estandarizar las claves en el panel 
+panel <- panel %>%
+  mutate(
+    cvegeo = case_when(
+      # Para códigos de CDMX (que empiezan con 9)
+      str_sub(cvegeo, 1, 1) == "9" ~ str_pad(cvegeo, width = 5, pad = "0", side = "left"),
+      # Para códigos del Edomex (que empiezan con 15)
+      str_sub(cvegeo, 1, 2) == "15" ~ cvegeo,  # Ya están correctos
+      # Para cualquier otro caso (por si acaso)
+      TRUE ~ str_pad(cvegeo, width = 5, pad = "0", side = "left")
+    )
+  )
+
+# 2. Verificar que el shapefile tenga el formato correcto
+shapefile <- shapefile %>%
+  mutate(
+    cvegeo = as.character(cvegeo) %>% 
+      str_pad(width = 5, pad = "0", side = "left")
+  )
+
+# 3. Verificación de coincidencias
+municipios_comunes <- intersect(shapefile$cvegeo, panel$cvegeo)
+
+# Mostrar diferencias para verificar
+cat("Municipios en panel pero no en shapefile:\n")
+setdiff(panel$cvegeo, shapefile$cvegeo) %>% print()
+
+cat("\nMunicipios en shapefile pero no en panel:\n")
+setdiff(shapefile$cvegeo, panel$cvegeo) %>% print()
+
+# 4. Crear los mapas panel corregidos
+mapas_por_anio <- lapply(2018:2022, function(anio) {
+  datos_anio <- panel %>% 
+    filter(fecha == anio, cvegeo %in% municipios_comunes)
+  
+  shapefile %>%
+    filter(cvegeo %in% municipios_comunes) %>%
+    left_join(datos_anio, by = "cvegeo") %>%
+    mutate(fecha = anio)
+})
+
+mapa_panel <- bind_rows(mapas_por_anio)
+
+# 5. Verificación final
+cat("\nResumen de cobertura:\n")
+mapa_panel %>% 
+  st_drop_geometry() %>% 
+  count(fecha) %>% 
+  print()
+
+library(ggplot2)
+library(viridis)
+
+ggplot(mapa_panel) +
+  geom_sf(aes(fill = densidad_industrial), color = "white", size = 0.2) +
+  scale_fill_viridis(name = "Densidad Industrial") +
+  facet_wrap(~fecha, ncol = 3) +
+  labs(title = "Evolución de la Densidad Industrial (2018-2022)") +
+  theme_void()
+
+
+
+
+
+ggplot(mapa_panel %>% filter(!is.na(densidad_industrial))) +
+  geom_sf(aes(fill = densidad_industrial), color = "white", size = 0.2) +
+  scale_fill_viridis_c() +
+  facet_wrap(~fecha) +
+  labs(title = "Densidad Industrial en ZMVM (2018-2022)",
+       subtitle = "Incluyendo CDMX y Estado de México") +
+  theme_void()
+
+
+
+ggplot(mapa_panel) +
+  geom_sf(aes(fill = densidad_industrial), color = "white", size = 0.2) +
+  scale_fill_viridis(
+    name = "Establecimientos por 10,000 hab",
+    option = "plasma",
+    direction = -1,
+    na.value = "grey90"
+  ) +
+  labs(
+    title = "Densidad de Establecimientos Industriales Contaminantes",
+    subtitle = "ZMVM, promedio 2018-2022"
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5),
+    legend.position = "right"
+  )
+
+# Identificar los 3 municipios más industriales cada año
+top_municipios <- mapa_panel %>%
+  st_drop_geometry() %>%
+  group_by(fecha) %>%
+  slice_max(order_by = densidad_industrial, n = 3) %>%
+  select(fecha, cvegeo, nom_mun, densidad_industrial)
+
+# Mapa con anotaciones
+ggplot(mapa_panel %>% filter(!is.na(densidad_cat))) +
+  geom_sf(aes(fill = densidad_cat), color = "white", size = 0.3) +
+  geom_sf_text(data = . %>% 
+                 inner_join(top_municipios, by = c("fecha", "cvegeo")),
+               aes(label = nom_mun), size = 2.5, color = "black",
+               check_overlap = TRUE) +
+  scale_fill_manual(
+    name = "Densidad Industrial",
+    values = paleta,
+    na.value = "grey90"
+  ) +
+  facet_wrap(~fecha, ncol = 3) +
+  labs(
+    title = "Concentración Industrial en la ZMVM (2018-2022)",
+    subtitle = "Áreas marcadas muestran los 3 municipios con mayor densidad industrial cada año",
+    caption = "El tamaño del círculo corresponde al número absoluto de establecimientos"
+  ) +
+  theme_void() +
+  theme(
+    plot.title = element_text(hjust = 0.5, face = "bold"),
+    legend.position = "bottom"
+  )
+
+# Calcular cambio porcentual
+mapa_cambio <- mapa_panel %>%
+  select(cvegeo, fecha, densidad_industrial) %>%
+  pivot_wider(names_from = fecha, values_from = densidad_industrial) %>%
+  mutate(cambio = (`2022` - `2018`)/`2018` * 100)
+
+# Mapa de cambio
+ggplot(mapa_cambio) +
+  geom_sf(aes(fill = cambio), color = "white") +
+  scale_fill_gradient2(
+    name = "Cambio % (2018-2022)",
+    low = "blue", mid = "white", high = "red",
+    midpoint = 0
+  )
+
+
+
+###############################################
+
