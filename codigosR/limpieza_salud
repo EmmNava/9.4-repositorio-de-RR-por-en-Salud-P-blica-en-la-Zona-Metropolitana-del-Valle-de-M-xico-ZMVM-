@@ -1,0 +1,423 @@
+library(sf)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(psych)
+library(lubridate)
+setwd('ruta')
+
+# Lee solo las primeras 5 líneas para ver la estructura
+lines <- readLines("EGRESOS_2019.txt", n = 5)
+cat(lines, sep = "\n")
+
+egresos_2018 <- read_csv("EGRESOS_2018.csv",
+                         na = c("NULL", ""))
+
+head(egresos_2018)       
+names(egresos_2018)  
+str(egresos_2018)       
+
+egresos_2019 <- read_csv("EGRESOS_2019.txt",
+                         na = c("NULL", ""))
+
+head(egresos_2019)       
+names(egresos_2019)      
+str(egresos_2019)        
+
+
+egresos_2020 <- read_delim("EGRESOS_2020.txt",
+                           delim = "|",
+                           na = c("NULL", ""))
+
+head(egresos_2020)     
+names(egresos_2020)    
+
+egresos_2021 <- read_delim("EGRESOS_2021.txt",
+                           delim = "|",
+                           na = c("NULL", "")) 
+head(egresos_2021)     
+names(egresos_2021)    
+
+egresos_2022 <- read_delim("EGRESOS_2022.txt",
+                           delim = "|",
+                           na = c("NULL",""))
+head(egresos_2022)     
+names(egresos_2022)    
+
+egresos_2023 <- read_delim("EGRESOS_2023.txt",
+                           delim = "|",
+                           na = c("NULL",""))
+head(egresos_2023)     
+names(egresos_2023)    
+############################################################################
+# Limpieza de datos para el año 2018  y creacion de CVEGEO:
+egresos_2018_limpia <- egresos_2018 %>%
+  select(CLUES, EGRESO, INGRE, DIAS_ESTA, EDAD, SEXO, ENTIDAD, MUNIC, LOC, DIAG_INI, AFECPRIN)
+glimpse(egresos_2018_limpia)
+
+# Crea la columna CVEGEO con formato estándar
+egresos_2018_limpia <- egresos_2018_limpia %>%
+  mutate(
+    ENTIDAD = str_pad(ENTIDAD, width = 2, side = "left", pad = "0"),
+    MUNIC = str_pad(MUNIC, width = 3, side = "left", pad = "0"),
+    CVEGEO = paste0(ENTIDAD, MUNIC)
+  )
+
+
+#Crearemos un vector para poder filtrar despues los municipios de la zona metropolitana del Valle de México:
+
+cvegeo_zmvm <- c(
+  # CDMX (16 alcaldías)
+  "09001", "09002", "09003", "09004", "09005", "09006", "09007", "09008",
+  "09009", "09010", "09011", "09012", "09013", "09014", "09015", "09016", "09017",
+  # Estado de México (códigos válidos)
+  "15002", "15070", "15011", "15013", "15020", "15025", "15031", "15033",
+  "15037", "15039", "15057", "15058", "15104", "15109", "15121", "15122",
+  "15099", "15100", "15028", "15029", "15030", "15108"
+)
+
+
+egresos_2018_filtrado <- egresos_2018_limpia[egresos_2018_limpia$CVEGEO %in% cvegeo_zmvm, ]
+
+# Vector con las claves que te interesan
+cie10_claves <- c("J459", "J189", "J209", "J441", "J029")
+
+# Filtrar por AFECPRIN dentro del subconjunto de la ZMVM
+egresos_2018_final <- egresos_2018_filtrado[egresos_2018_filtrado$AFECPRIN %in% cie10_claves, ]
+
+
+nrow(egresos_2018_final)
+table(egresos_2018_final$AFECPRIN)
+
+
+
+egresos_2018_final %>%
+  count(AFECPRIN, sort = TRUE)
+
+casos_por_municipio <- egresos_2018_final %>%
+  count(CVEGEO, MUNIC, sort = TRUE)
+
+print(casos_por_municipio)
+
+ggplot(casos_por_municipio, aes(x = reorder(MUNIC, n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +  # Para que las etiquetas se vean mejor
+  labs(title = "Número de casos por municipio (2019)",
+       x = "Municipio",
+       y = "Número de casos") +
+  theme_minimal()
+
+ggplot(casos_por_municipio, aes(x = reorder(CVEGEO, n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Número de casos por municipio (2018)",
+       x = "Clave Geo (CVEGEO)",
+       y = "Número de casos") +
+  theme_minimal()
+
+ggplot(casos_por_municipio, aes(x = reorder(MUNIC, n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Número de casos por municipio (2018)",
+       x = "Municipio",
+       y = "Número de casos") +
+  theme_minimal()
+
+describe(egresos_2018_final$AFECPRIN,$cvegeo)
+#############################################################################
+
+# Limpieza de datos para el año 2019  y creacion de CVEGEO:
+egresos_2019_limpia <- egresos_2019 %>%
+  select(CLUES, EGRESO, INGRE, DIAS_ESTA, EDAD, SEXO, ENTIDAD, MUNIC, LOC, DIAG_INI, AFECPRIN)
+glimpse(egresos_2019_limpia)
+
+# Crea la columna CVEGEO con formato estándar
+egresos_2019_limpia <- egresos_2019_limpia %>%
+  mutate(
+    ENTIDAD = str_pad(ENTIDAD, width = 2, side = "left", pad = "0"),
+    MUNIC = str_pad(MUNIC, width = 3, side = "left", pad = "0"),
+    CVEGEO = paste0(ENTIDAD, MUNIC)
+  )
+ 
+
+egresos_2019_filtrado <- egresos_2019_limpia[egresos_2019_limpia$CVEGEO %in% cvegeo_zmvm, ]
+
+
+# Filtrar por AFECPRIN dentro del subconjunto de la ZMVM
+egresos_2019_final <- egresos_2019_filtrado[egresos_2019_filtrado$AFECPRIN %in% cie10_claves, ]
+
+
+nrow(egresos_2019_final)
+table(egresos_2019_final$AFECPRIN)
+
+
+
+egresos_2019_final %>%
+  count(AFECPRIN, sort = TRUE)
+
+casos_por_municipio <- egresos_2019_final %>%
+  count(CVEGEO, MUNIC, sort = TRUE)
+
+print(casos_por_municipio)
+
+ggplot(casos_por_municipio, aes(x = reorder(MUNIC, n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +  # Para que las etiquetas se vean mejor
+  labs(title = "Número de casos por municipio (2019)",
+       x = "Municipio",
+       y = "Número de casos") +
+  theme_minimal()
+
+ggplot(casos_por_municipio, aes(x = reorder(CVEGEO, n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Número de casos por municipio (2019)",
+       x = "Clave Geo (CVEGEO)",
+       y = "Número de casos") +
+  theme_minimal()
+
+ggplot(casos_por_municipio, aes(x = reorder(MUNIC, n), y = n)) +
+  geom_bar(stat = "identity", fill = "steelblue") +
+  coord_flip() +
+  labs(title = "Número de casos por municipio (2019)",
+       x = "Municipio",
+       y = "Número de casos") +
+  theme_minimal()
+
+describe(egresos_2019_final$AFECPRIN, $CVEGEO)
+#######################################################################################
+
+# Limpieza de datos para el año 2020  y creacion de CVEGEO:
+egresos_2020_limpia <- egresos_2020 %>%
+  select(CLUES, EGRESO, INGRE, DIAS_ESTA, EDAD, SEXO, ENTIDAD, MUNIC, LOC, DIAG_INI, AFECPRIN)
+glimpse(egresos_2020_limpia)
+
+# Crea la columna CVEGEO con formato estándar
+egresos_2020_limpia <- egresos_2020_limpia %>%
+  mutate(
+    ENTIDAD = str_pad(ENTIDAD, width = 2, side = "left", pad = "0"),
+    MUNIC = str_pad(MUNIC, width = 3, side = "left", pad = "0"),
+    CVEGEO = paste0(ENTIDAD, MUNIC)
+  )
+
+
+
+
+
+
+egresos_2020_filtrado <- egresos_2020_limpia[egresos_2020_limpia$CVEGEO %in% cvegeo_zmvm, ]
+
+
+
+# Filtrar por AFECPRIN dentro del subconjunto de la ZMVM
+egresos_2020_final <- egresos_2020_filtrado[egresos_2020_filtrado$AFECPRIN %in% cie10_claves, ]
+
+
+nrow(egresos_2020_final)
+table(egresos_2020_final$AFECPRIN)
+
+
+
+egresos_2020_final %>%
+  count(AFECPRIN, sort = TRUE)
+
+##########################################################################################
+
+# Limpieza de datos para el año 2021  y creacion de CVEGEO:
+egresos_2021_limpia <- egresos_2021 %>%
+  select(CLUES, EGRESO, INGRE, DIAS_ESTA, EDAD, SEXO, ENTIDAD, MUNIC, LOC, DIAG_INI, AFECPRIN)
+glimpse(egresos_2021_limpia)
+
+# Crea la columna CVEGEO con formato estándar
+egresos_2021_limpia <- egresos_2021_limpia %>%
+  mutate(
+    ENTIDAD = str_pad(ENTIDAD, width = 2, side = "left", pad = "0"),
+    MUNIC = str_pad(MUNIC, width = 3, side = "left", pad = "0"),
+    CVEGEO = paste0(ENTIDAD, MUNIC)
+  )
+
+
+
+egresos_2021_filtrado <- egresos_2021_limpia[egresos_2021_limpia$CVEGEO %in% cvegeo_zmvm, ]
+
+
+# Filtrar por AFECPRIN dentro del subconjunto de la ZMVM
+egresos_2021_final <- egresos_2021_filtrado[egresos_2021_filtrado$AFECPRIN %in% cie10_claves, ]
+
+
+nrow(egresos_2021_final)
+table(egresos_2021_final$AFECPRIN)
+
+
+
+egresos_2021_final %>%
+  count(AFECPRIN, sort = TRUE)
+
+##############################################################################################
+
+# Limpieza de datos para el año 2022  y creacion de CVEGEO:
+egresos_2022_limpia <- egresos_2022 %>%
+  select(CLUES, EGRESO, INGRE, DIAS_ESTA, EDAD, SEXO, ENTIDAD, MUNIC, LOC, DIAG_INI, AFECPRIN)
+glimpse(egresos_2022_limpia)
+
+# Crea la columna CVEGEO con formato estándar
+egresos_2022_limpia <- egresos_2022_limpia %>%
+  mutate(
+    ENTIDAD = str_pad(ENTIDAD, width = 2, side = "left", pad = "0"),
+    MUNIC = str_pad(MUNIC, width = 3, side = "left", pad = "0"),
+    CVEGEO = paste0(ENTIDAD, MUNIC)
+  )
+
+
+
+egresos_2022_filtrado <- egresos_2022_limpia[egresos_2022_limpia$CVEGEO %in% cvegeo_zmvm, ]
+
+
+# Filtrar por AFECPRIN dentro del subconjunto de la ZMVM
+egresos_2022_final <- egresos_2022_filtrado[egresos_2022_filtrado$AFECPRIN %in% cie10_claves, ]
+
+
+nrow(egresos_2022_final)
+table(egresos_2022_final$AFECPRIN)
+
+
+
+egresos_2022_final %>%
+  count(AFECPRIN, sort = TRUE)
+
+###################################################################################
+
+# Limpieza de datos para el año 2023  y creacion de CVEGEO:
+egresos_2023_limpia <- egresos_2023 %>%
+  select(CLUES, EGRESO, INGRE, DIAS_ESTA, EDAD, SEXO, ENTIDAD, MUNIC, LOC, DIAG_INI, AFECPRIN)
+glimpse(egresos_2023_limpia)
+
+# Crea la columna CVEGEO con formato estándar
+egresos_2023_limpia <- egresos_2023_limpia %>%
+  mutate(
+    ENTIDAD = str_pad(ENTIDAD, width = 2, side = "left", pad = "0"),
+    MUNIC = str_pad(MUNIC, width = 3, side = "left", pad = "0"),
+    CVEGEO = paste0(ENTIDAD, MUNIC)
+  )
+
+
+
+egresos_2023_filtrado <- egresos_2023_limpia[egresos_2023_limpia$CVEGEO %in% cvegeo_zmvm, ]
+
+
+
+# Filtrar por AFECPRIN dentro del subconjunto de la ZMVM
+egresos_2023_final <- egresos_2023_filtrado[egresos_2023_filtrado$AFECPRIN %in% cie10_claves, ]
+
+
+nrow(egresos_2023_final)
+table(egresos_2023_final$AFECPRIN)
+
+
+
+egresos_2023_final %>%
+  count(AFECPRIN, sort = TRUE)
+
+######################################################################################
+
+#Ahora vamos a unir las tablas:
+
+
+
+egresos_2018_final <- egresos_2018_final %>% mutate(anio = 2018)
+egresos_2019_final <- egresos_2019_final %>% mutate(anio = 2019)
+egresos_2020_final <- egresos_2020_final %>% mutate(anio = 2020)
+egresos_2021_final <- egresos_2021_final %>% mutate(anio = 2021)
+egresos_2022_final <- egresos_2022_final %>% mutate(anio = 2022)
+
+
+# Unir todas las tablas en una sola
+egresos_todos_new <- bind_rows(
+  egresos_2018_final,
+  egresos_2019_final,
+  egresos_2020_final,
+  egresos_2021_final,
+  egresos_2022_final,
+  )
+
+glimpse(egresos_todos_new)
+table(egresos_todos_new$anio)
+
+#Guardaremos la tabla resultante
+
+write.csv(egresos_todos_new, "C:/Users/Jesus Emmanuel/Desktop/Proyecto_final_esp/Base de datos egresos hospitalarios 2019-2023/egresos_2018_2022_new.csv", row.names = FALSE, fileEncoding = "UTF-8")
+
+saveRDS(egresos_todos_new, file = "C:/Users/Jesus Emmanuel/Desktop/Proyecto_final_esp/Base de datos egresos hospitalarios 2019-2023/egresos_2019_2022_amvm.rds")
+
+##########################################################################################
+ #Analisis estadistico exploratorio de los datos:
+
+str(egresos_todos)
+summary(egresos_todos)
+
+
+
+egresos_todos %>%
+  count(AFECPRIN, sort = TRUE)
+
+
+egresos_todos %>%
+  mutate(anio = format(as.Date(EGRESO), "%Y")) %>%
+  count(anio, AFECPRIN) %>%
+  arrange(anio, desc(n))
+
+egresos_todos %>%
+  mutate(anio = format(as.Date(EGRESO), "%Y")) %>%
+  count(anio, AFECPRIN) %>%
+  ggplot(aes(x = anio, y = n, color = AFECPRIN, group = AFECPRIN)) +
+  geom_line(size = 1) +
+  geom_point() +
+  labs(title = "Número de casos por AFECPRIN (por año)",
+       x = "Año",
+       y = "Número de casos",
+       color = "AFECPRIN") +
+  theme_minimal()
+
+egresos_todos %>%
+  mutate(anio = format(as.Date(EGRESO), "%Y")) %>%
+  count(anio, AFECPRIN) %>%
+  ggplot(aes(x = anio, y = n, fill = AFECPRIN)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(title = "Casos por año y AFECPRIN",
+       x = "Año",
+       y = "Número de casos",
+       fill = "AFECPRIN") +
+  theme_minimal()
+
+egresos_todos %>%
+  mutate(anio = format(as.Date(EGRESO), "%Y")) %>%
+  count(anio, AFECPRIN) %>%
+  ggplot(aes(x = anio, y = n, fill = AFECPRIN)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Casos por año y por enfermedad (AFECPRIN)",
+       x = "Año",
+       y = "Número de casos",
+       fill = "AFECPRIN") +
+  theme_minimal()
+
+
+egresos_todos %>%
+  mutate(fecha_ingreso = as.Date(INGRE),
+         anio = year(fecha_ingreso)) %>%
+  filter(anio == 2019,
+         AFECPRIN %in% c("J189")) %>%
+  count(fecha_ingreso, AFECPRIN) %>%
+  ggplot(aes(x = fecha_ingreso, y = n)) +
+  geom_line(color = "steelblue", size = 0.8) +
+  facet_wrap(~ AFECPRIN, ncol = 1, scales = "free_y") +
+  labs(title = "Ingresos hospitalarios diarios por enfermedad (2019)",
+       x = "Fecha de ingreso",
+       y = "Número de ingresos") +
+  theme_minimal() +
+  theme(strip.text = element_text(face = "bold"))
+
+
+
+
+write.csv(base_unida, "panel_anual_con_salud.csv", row.names = FALSE)
+
