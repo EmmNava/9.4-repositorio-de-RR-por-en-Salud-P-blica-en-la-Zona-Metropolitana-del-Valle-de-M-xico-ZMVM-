@@ -1,0 +1,159 @@
+library(tidyverse)
+library(readxl)
+library(dplyr)
+
+setwd('C:/Users/Jesus Emmanuel/Desktop/Proyecto_final_esp/indice_marginacion')
+
+im_2020   <- read_excel("IMM_2020.xls", skip = 5)
+im_2015 <- read_excel("IMM_DP2_2015.xlsx", skip = 5)
+
+# Vector de municipios de interés
+cvegeo_zmvm <- c(
+  "09001", "09002", "09003", "09004", "09005", "09006", "09007", "09008",
+  "09009", "09010", "09011", "09012", "09013", "09014", "09015", "09016", "09017",
+  "15002", "15070", "15011", "15013", "15020", "15025", "15031", "15033",
+  "15037", "15039", "15057", "15058", "15104", "15109", "15121", "15122",
+  "15099", "15100", "15028", "15029", "15030", "15108"
+)
+
+# Procesar datos 2020
+im_2020_clean <- im_2020 %>%
+  # Renombrar columna CVE_MUN a cvegeo
+  rename(cvegeo = CVE_MUN) %>%
+  # Filtrar solo municipios de interés
+  filter(cvegeo %in% cvegeo_zmvm) %>%
+  # Seleccionar columnas requeridas
+  select(cvegeo, IM_2020 = IM_2020, GM_2020 = GM_2020)
+
+# Procesar datos 2015
+im_2015_clean <- im_2015 %>%
+  # Renombrar columna CVE_MUN a cvegeo (asumiendo que tiene el mismo nombre)
+  rename(cvegeo = CVE_MUN) %>%
+  # Filtrar solo municipios de interés
+  filter(cvegeo %in% cvegeo_zmvm) %>%
+  # Seleccionar columnas requeridas
+  select(cvegeo, IM_2015 = IM_2015, GM_2015 = GM_2015)
+
+# Combinar ambas tablas 
+marginacion_zmvm <- full_join(im_2015_clean, im_2020_clean, by = "cvegeo")
+
+# Ver resultado
+head(marginacion_zmvm)
+
+##############################################################################
+#Preparar datos para unir con la tabla:
+
+library(tidyverse)
+library(readxl)
+
+# Cargar y limpiar datos de marginación
+im_2020 <- read_excel("IMM_2020.xls", skip = 5) %>%
+  rename(cvegeo = CVE_MUN) %>%
+  filter(cvegeo %in% cvegeo_zmvm) %>%
+  select(cvegeo, IM = IM_2020, GM = GM_2020)
+
+im_2015 <- read_excel("IMM_DP2_2015.xlsx", skip = 5) %>%
+  rename(cvegeo = CVE_MUN) %>%
+  filter(cvegeo %in% cvegeo_zmvm) %>%
+  select(cvegeo, IM = IM_2015, GM = GM_2015)
+
+# Crear tabla panel de marginación sin nomgeo
+panel_marginacion <- bind_rows(
+  # Datos 2015 para años 2018-2019
+  im_2015 %>% 
+    crossing(fecha = 2018:2019),
+  
+  # Datos 2020 para años 2020-2022
+  im_2020 %>% 
+    crossing(fecha = 2020:2022)
+) %>%
+  arrange(cvegeo, fecha) %>%
+  # Asegurar que cvegeo es character para el join
+  mutate(cvegeo = as.character(cvegeo))
+
+# Verificar estructura
+glimpse(panel_marginacion)
+
+# Opcional: Ver primeros registros
+head(panel_marginacion)
+
+# Guardar como CSV 
+write_csv(panel_marginacion, "marginacion_panel.csv")
+
+##########################################################
+#Unir tablas
+
+##Procesar tabla de enfermedades ----
+  panel_enfermedades <- read_csv("panel_con_enf_pob.csv") %>%
+  # Eliminar columnas no deseadas
+  select(-`MUJ_MIT_AÑO`, -`HOM_MIT_AÑO`) %>%
+  # Asegurar que cvegeo es character para el join
+  mutate(cvegeo = as.character(cvegeo))
+
+# 3. Unir las tablas ----
+tabla_final <- panel_enfermedades %>%
+  left_join(panel_marginacion, by = c("cvegeo", "fecha")) %>%
+  arrange(cvegeo, fecha)
+
+# 4. Verificar y guardar resultados ----
+# Ver estructura
+glimpse(tabla_final)
+
+# Ver 
+head(tabla_final)
+
+# Guardar 
+write_csv(tabla_final, "panel_marg_cont.csv")
+
+######################################################################
+library(ggplot2)
+
+tabla_final$IM <- as.numeric(tabla_final$IM)
+
+# Verificar
+class(tabla_final$IM)  # Debe decir "numeric"
+
+
+# Histograma del índice de marginación
+ggplot(tabla_final, aes(x = IM)) +
+  geom_histogram(bins = 20, fill = "steelblue") +
+  labs(title = "Distribución del Índice de Marginación", x = "Valor del Índice", y = "Frecuencia")
+
+# Resumen estadístico
+summary(tabla_final$IM)
+
+
+library(ggplot2)
+
+# Histograma 
+ggplot(tabla_final, aes(x = IM)) +
+  geom_histogram(
+    bins = 15,                  # Número de barras (ajústalo si necesario)
+    fill = "#1E90FF",           # Color azul moderno
+    color = "white",            # Bordes blancos
+    alpha = 0.8                 # Transparencia
+  ) +
+  labs(
+    title = "Distribución del Índice de Marginación en la ZMVM",
+    subtitle = "Datos municipales (2018-2022)",
+    x = "Índice de Marginación (CONAPO)", 
+    y = "Número de municipios"
+  ) +
+  theme_minimal() +             # Diseño limpio
+  theme(
+    plot.title = element_text(face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5)
+  ) +
+  geom_vline(                   # Línea vertical para la media
+    xintercept = mean(tabla_final$IM), 
+    linetype = "dashed", 
+    color = "red", 
+    linewidth = 1
+  ) +
+  annotate(                     # Anotación para la media
+    "text",
+    x = mean(tabla_final$IM) + 2, 
+    y = max(hist(tabla_final$IM, breaks = 15)$counts) * 0.9,
+    label = paste("Media =", round(mean(tabla_final$IM), 2)), 
+    color = "red"
+  )
