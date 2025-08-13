@@ -1,0 +1,799 @@
+---
+  title: "Riesgo Relativo Enfermedades"
+date: "2025-07-01"
+output: html_document
+---
+  install.packages("devtools")
+install.packages("sf")
+install.packages("spdep")
+devtools::install_github("hrue/r-inla", subdir = "R")
+install.packages(bmstdr)
+install.packages("Rcpp")
+install.packages("gt")
+
+library(usethis)
+library(devtools)
+library(Matrix)
+library(sp)
+library(sf)
+library(spData)
+library(spdep)
+library(INLA)
+library(readxl)
+library(SpatialEpi)
+library(stats)
+library(base)
+library(dplyr)
+library(openxlsx)
+library(bmstdr)
+library(Rcpp)
+library(patchwork)
+library(gt)
+library(scoringRules)
+library(tmap)
+
+
+setwd('ruta**')
+
+# Municipios
+shapefile <- st_read("recorte_zmvm.shp")
+nb <- poly2nb(shapefile)
+# Crear la matriz de pesos espaciales directamente como una matriz regular
+W_dense <- nb2mat(nb, style = "B", zero.policy = TRUE)
+# Eliminar la columna 'nomgeo' del shapefile
+shapefile <- shapefile %>%
+  select(-nomgeo)
+
+# Leer la base de datos
+data_path <- "panel_final_corregido.csv"  # Reemplaza con la ruta correcta a tu archivo
+data <- read.csv(data_path)
+data$cvegeo <- sprintf("%05d", data$cvegeo)
+
+#Estimación de casos esperados
+E <- expected(population = data$POB, cases = data$cases, n.strata = 1)
+
+#E <- expected(population = data$egresos, cases = data$casos, 1)
+
+
+data$E <- E[match(data$cvegeo, unique(data$cvegeo))]
+
+# Variables extra
+
+data <- data %>%
+  mutate(SIR = cases/E,
+         tasa = (data$cases / data$POB) * 100000,
+         idarea = as.numeric(as.factor(data$cvegeo)),
+         idarea1 = idarea,
+         idtime = 1 + as.integer(fecha) - min(as.integer(fecha)))
+
+#idtime1 = idtime,
+#idareatime = as.numeric(paste0(idarea, idtime)))
+
+# Convertir CVEGEO en ambos dataframes al mismo tipo (string/character)
+data$cvegeo <- as.character(data$cvegeo)
+shapefile$cvegeo <- as.character(shapefile$cvegeo)
+
+shapefile <- shapefile %>%
+  full_join(data, by = "cvegeo")
+
+sdunif = "expression:
+logdens = -log_precision/2;
+return(logdens)"
+
+u_prior <- list( 
+  prec = list(
+    prior = sdunif,
+    phi = list(
+      prior = sdunif)))
+
+i_prior <- list( 
+  prec = list(
+    prior = "pc.prec",
+    param = c(0.5 / 0.31, 0.01)),
+  phi = list(
+    prior = "pc",
+    param = c(0.5, 2/3)))
+##################################################################################
+
+################################################################################
+# st_crs(shapefile)
+########################## Calcular densidad industrial por superficie del municipio
+# Reproyectar (elige la zona UTM adecuada para tu región)
+shapefile_m <- st_transform(shapefile, crs = 6372)  # EPSG:6372 = UTM zona 14N con NAD83
+shapefile_m$superficie_km2 <- st_area(shapefile_m) / 10^6  # Área en m² convertido a km²
+shapefile_m$dens_industrial_km2 <- shapefile_m$num_establecimientos / shapefile_m$superficie_km2
+summary(shapefile_m$dens_industrial_km2)
+
+shapefile_m$dens_industrial_km2_std <- scale(shapefile_m$dens_industrial_km2)## estandarizar la variable
+names(shapefile_m)
+
+shapefile_m$dens_industrial_pob <- (shapefile_m$num_establecimientos / shapefile_m$POB) * 100000
+shapefile_m$dens_industrial_pob_std <- scale(shapefile_m$dens_industrial_pob)
+# cor(shapefile_m$dens_industrial_km2, shapefile_m$dens_industrial_pob, use = "complete.obs")
+# cor(shapefile_m$J189, shapefile_m$NO2_std, use = "complete.obs")
+############################################################################################
+#estandarizacion de variables
+
+# Estandarizar variables ambientales y climáticas
+shapefile_m <- shapefile_m %>%
+  mutate(
+    TMP_std = scale(TMP)[,1],
+    NO2_std = scale(NO2)[,1],
+    PM10_std = scale(PM10)[,1],
+    PM25_std = scale(PM25)[,1],
+    RH_std = scale(RH)[,1],
+    IM_std = scale(IM)[,1]
+  )
+
+##################################################################################
+## 1) Modelos Poisson
+
+formula_rw <- cases ~ 1 +IM_std+ TMP_std + NO2_std + PM25_std   + offset(log(E))
+
+
+mNbin <-Bcartime(formula=formula_rw, data=shapefile_m, scol="idarea",tcol="idtime",
+                 W=W_dense, model=c("bym2", "ar1"), family="Nbinomial", package="INLA")
+
+
+#mpoisson <-Bcartime(formula=formula_rw, data=shapefile_m, scol="idarea",tcol="idtime",
+                    #W=W_dense, model=c("bym2", "ar1"), family="poisson", package="INLA")
+
+
+
+#mpoissonO <-Bcartime(formula=formula_rw, data=shapefile_m, scol="idarea",tcol="idtime",
+                     #W=W_dense, model=c("bym2", "ar1"), family="Zeroinflatedpoisson0", package="INLA")
+
+#mNbin0 <-Bcartime(formula=formula_rw, data=shapefile_m, scol="idarea",tcol="idtime",
+                  #W=W_dense, model=c("bym2", "ar1"), family="zeroinflatednbinomial1", package="INLA")
+
+mNbin[["fit"]][["summary.fixed"]] |> round(3) |> tibble::rownames_to_column("Parameter") |>
+  gt()
+
+mNbin[["fit"]][["summary.hyperpar"]] |> round(3) |> tibble::rownames_to_column("Parameter") |>
+  gt()
+
+
+
+shapefile_m$RR_corrected <- exp(mNbin$fit$summary.linear.predictor$mean - log(shapefile_m$E))
+select()
+
+
+
+# Renombrar columna RR a tasa_cruda
+names(shapefile_m)[names(shapefile_m) == "RR"] <- "tasa_cruda"
+
+
+
+####################################################################################
+cor(shapefile_m$PM25_std, shapefile_m$NO2_std, use = "complete.obs")
+######################################################################################
+# Si fitteds contiene los valores predichos, podemos extraerlos
+predicciones <- mNbin$fitteds
+
+# Si predicciones es un data.frame o lista con el componente `mean`:
+if (is.data.frame(predicciones) || is.list(predicciones)) {
+  predicted_cases <- exp(predicciones$mean)  # Ajustar si `mean` no es el nombre correcto
+} else {
+  predicted_cases <- exp(predicciones)  # Si `predicciones` es directamente un vector de predicciones
+}
+
+# Calcular el Riesgo Relativo (RR)
+ RR <- exp(mNbin$fit$summary.linear.predictor$mean)
+
+# Agregar el RR al shapefile
+shapefile_m$RR <- RR
+
+# Extraer las estadísticas y aplicar la exponencial si es necesario
+summary_values <- mNbin$fit$summary.fitted.values
+
+# Crear el data frame con las estadísticas extraídas
+# Los valores ya están en escala de conteo esperados, no aplicar exp()
+estadisticas <- data.frame(
+  mean = summary_values$mean,
+  mode = summary_values$mode,
+  lower = summary_values$`0.025quant`,
+  median = summary_values$`0.5quant`,
+  upper = summary_values$`0.975quant`
+)
+
+
+# Unir las estadísticas con el shapefile
+shapefile_m <- shapefile_m %>%
+  mutate(
+    Predicted_Mean = estadisticas$mean,
+    Predicted_Mode = estadisticas$mode,
+    Lower_CI = estadisticas$lower,
+    Median = estadisticas$median,
+    Upper_CI = estadisticas$upper
+  )
+###########################################################################
+
+###########################################################################
+
+# Definir el umbral q
+q_rr <- quantile(shapefile_m$RR, 0.75, na.rm = TRUE)  # Umbral en el percentil 75
+
+q <- log(q_rr)  # Escala log si usas marginals.linear.predictor
+
+
+# Calcular la probabilidad de excedencia
+# Calcular probabilidad de RR > 2
+
+exc <- sapply(mNbin$fit$marginals.linear.predictor, function(marg) {
+  
+  1 - inla.pmarginal(q = q, marginal = marg)
+  
+})
+
+# Agregar la probabilidad de excedencia al shapefile
+shapefile_m$Exc_Prob <- exc
+
+# Unir las estadísticas con la base de datos original
+data <- data %>%
+  left_join(shapefile_m %>% select(cvegeo, idarea, idtime, RR, Predicted_Mean, Predicted_Mode, Lower_CI, Median, Upper_CI, Exc_Prob),
+            by = c("cvegeo", "idarea", "idtime"))
+
+# Asegurarse que las claves estén como caracteres y numéricas
+data <- data %>%
+  mutate(cvegeo = as.character(cvegeo),
+         idarea = as.numeric(idarea),
+         idtime = as.numeric(idtime))
+
+shapefile_m <- shapefile_m %>%
+  mutate(cvegeo = as.character(cvegeo),
+         idarea = as.numeric(idarea),
+         idtime = as.numeric(idtime))
+
+# Unir todas las variables normalizadas y de densidad industrial
+data <- data %>%
+  left_join(
+    shapefile_m %>%
+      st_drop_geometry() %>%
+      select(cvegeo, idarea, idtime,
+             # Variables normalizadas
+             NO2_std, TMP_std, PM10_std, PM25_std, RH_std, IM_std,
+             # Densidades industriales
+             superficie_km2,
+             dens_industrial_km2, dens_industrial_km2_std,
+             dens_industrial_pob, dens_industrial_pob_std),
+    by = c("cvegeo", "idarea", "idtime")
+  )
+
+
+
+
+################################################################################
+library(gt)
+
+# Guardar efectos fijos en CSV
+mNbin$fit$summary.fixed |>
+  round(3) |>
+  tibble::rownames_to_column("Variable") |>
+  gt()
+
+# Crear el data frame
+efectos_fijos <- mNbin$fit$summary.fixed |>
+  round(3) |>
+  tibble::rownames_to_column("Variable")
+
+# Guardar como CSV
+write.csv(efectos_fijos, "efectos_fijos_RR210725.csv", row.names = FALSE)
+
+################################################################################
+library(tidyr)
+
+RR_inicio_fin <- shapefile_m %>%
+  filter(fecha %in% c(2018, 2022)) %>%
+  select(cvegeo, fecha, RR) %>%
+  pivot_wider(names_from = fecha, values_from = RR, names_prefix = "RR_")
+
+
+# Calcular la TCR
+RR_inicio_fin <- RR_inicio_fin %>%
+  mutate(
+    TCR = ((RR_2022 - RR_2018) / RR_2018) * 100,
+    tendencia = case_when(
+      TCR > 10 ~ "Aumento",
+      TCR < -10 ~ "Disminución",
+      TRUE ~ "Estable"
+    )
+  )
+
+# Eliminar geometría si existe
+RR_inicio_fin_df <- st_drop_geometry(RR_inicio_fin)
+
+write.csv(RR_inicio_fin_df, "TCR_tendencia_RR_2018_2022_210725.csv", row.names = FALSE)
+
+###############################################################################################################
+
+
+# Unir RR_corrected 
+data <- data %>%
+  left_join(
+    shapefile_m %>%
+      st_drop_geometry() %>%
+      select(cvegeo, idarea, idtime, RR_corrected),
+    by = c("cvegeo", "idarea", "idtime")
+  )
+
+# Eliminar las columnas de geometría
+data_clean <- data %>% select(-geometry)
+
+# Guardar como archivo Excel
+write.xlsx(data_clean, file = "bayes_final_210725.xlsx", rowNames = FALSE)
+# Guardar como CSV
+write.csv(data_clean, file = "bayes_final210725.csv", row.names = FALSE)
+
+
+# Especificar la ruta del archivo
+
+st_write(shapefile_m, "bayes_final210725.shp")
+
+## Validación cruzada
+
+# Definir vectores para almacenar las métricas
+RMSE <- numeric()
+MAE <- numeric()
+CRPS <- numeric()
+
+# Fijar la proporción de entrenamiento y prueba
+train_ratio <- 0.8
+test_ratio <- 0.2
+
+# Crear un índice de muestra para dividir los datos
+set.seed(123) # Fijar la semilla para la reproducibilidad
+train_index <- sample(seq_len(nrow(shapefile_m)), size = floor(train_ratio * nrow(shapefile_m)))
+
+# Dividir los datos en conjuntos de entrenamiento y prueba
+train_data <- shapefile_m[train_index, ]
+test_data <- shapefile_m[-train_index, ]
+
+# Extraer las medias de los efectos fijos del modelo ajustado
+fixed_effects <- mNbin$fit$summary.fixed$mean
+names(fixed_effects) <- rownames(mNbin$fit$summary.fixed)
+
+
+
+#Para detectar errores 
+#stopifnot(all(c("PM10", "PM25", "NO2", "TMP", "dens_industrial_pob", "E", "cases") %in% colnames(test_data)))
+
+
+# Calcular predicciones manualmente
+# Calcular predicciones manualmente
+
+
+pred_mean <- exp(
+  fixed_effects["(Intercept)"] +
+    fixed_effects["IM_std"] * test_data$IM_std +
+    fixed_effects["TMP_std"] * test_data$TMP_std +
+    fixed_effects["PM25_std"] * test_data$PM25_std+
+    fixed_effects["NO2_std"] * test_data$NO2_std +
+    log(test_data$E)
+)
+
+
+
+
+# Calcular las métricas
+obs <- test_data$cases
+
+# Calcular RMSE
+rmse <- sqrt(mean((obs - pred_mean)^2))
+RMSE <- c(RMSE, rmse)
+
+# Calcular MAE
+mae <- mean(abs(obs - pred_mean))
+MAE <- c(MAE, mae)
+
+# Calcular CRPS
+crps <- mean(crps_norm(obs, mean = pred_mean, sd = rep(1, length(pred_mean))))
+CRPS <- c(CRPS, crps)
+
+# Guardar en los vectores acumuladores
+RMSE <- c(RMSE, rmse)
+MAE  <- c(MAE, mae)
+CRPS <- c(CRPS, crps)
+
+# Mostrar los resultados
+cat("RMSE:", mean(RMSE[is.finite(RMSE)]), "\n")
+cat("MAE:",  mean(MAE[is.finite(MAE)]),  "\n")
+cat("CRPS:", mean(CRPS[is.finite(CRPS)]), "\n")
+
+###############################################################################################
+#Guardar resultados
+
+# install.packages("openxlsx")
+
+library(openxlsx)
+library(tibble)
+library(dplyr)
+
+# Crear un workbook nuevo
+wb <- createWorkbook()
+
+## --- Hoja 1: Summary Fixed ---
+fixed_df <- mNbin[["fit"]][["summary.fixed"]] |>
+  round(3) |>
+  rownames_to_column("Parameter")
+
+addWorksheet(wb, "Fixed Effects")
+writeData(wb, "Fixed Effects", fixed_df)
+
+## --- Hoja 2: Summary Hyperparameters ---
+hyper_df <- mNbin[["fit"]][["summary.hyperpar"]] |>
+  round(3) |>
+  rownames_to_column("Parameter")
+
+addWorksheet(wb, "Hyperparameters")
+writeData(wb, "Hyperparameters", hyper_df)
+
+## --- Hoja 3: Métricas (RMSE, MAE, CRPS) ---
+metrics_df <- data.frame(
+  Métrica = c("RMSE", "MAE", "CRPS"),
+  Valor = c(
+    mean(RMSE[is.finite(RMSE)]),
+    mean(MAE[is.finite(MAE)]),
+    mean(CRPS[is.finite(CRPS)])
+  )
+)
+
+
+# mNbin$fit$dic$dic     # ¿devuelve un valor numérico?
+# mNbin$fit$waic$waic   # ¿devuelve un valor numérico?
+# mNbin$fit$cp$cp       # ¿devuelve un valor numérico?
+# 
+# names(mNbin$fit)
+# names(mNbin$fit$dic)
+# mNbin$fit$dic
+
+
+## --- Hoja 4: Criterios de Información ---
+criterios_df <- data.frame(
+  Criterio = c("DIC", "WAIC", "PMCC"),
+  Valor = c(
+    mNbin$fit$dic$dic,
+    mNbin$fit$waic$waic,
+    mNbin$fit$dic$p.eff
+  )
+)
+
+addWorksheet(wb, "Criterios de Información")
+writeData(wb, "Criterios de Información", criterios_df)
+
+
+
+addWorksheet(wb, "Métricas")
+writeData(wb, "Métricas", metrics_df)
+
+## --- Guardar archivo Excel ---
+saveWorkbook(wb, file = "hyperparametros_finales_ar1_210725.xlsx", overwrite = TRUE)
+
+
+#############################################################################################
+
+#comparativo de dic, waic y pmcc entre modelos
+
+library(openxlsx)
+
+# Crear workbook
+wb <- createWorkbook()
+
+# Comparar criterios para cada modelo
+# Crear tabla de criterios
+criterios_df <- data.frame(
+  Modelo = c("NegBinomial", "Poisson", "Zeroinflated Poisson", "Zeroinflated NegBinomial"),
+  DIC = c(
+    mNbin$fit$dic$dic,
+    mpoisson$fit$dic$dic,
+    mpoissonO$fit$dic$dic,
+    mNbin0$fit$dic$dic
+  ),
+  WAIC = c(
+    mNbin$fit$waic$waic,
+    mpoisson$fit$waic$waic,
+    mpoissonO$fit$waic$waic,
+    mNbin0$fit$waic$waic
+  ),
+  PMCC = c(
+    mNbin$fit$dic$p.eff,
+    mpoisson$fit$dic$p.eff,
+    mpoissonO$fit$dic$p.eff,
+    mNbin0$fit$dic$p.eff
+  )
+)
+
+# Redondear solo columnas numéricas
+criterios_df[, -1] <- round(criterios_df[, -1], 3)
+
+
+# Agregar hoja y escribir la tabla
+addWorksheet(wb, "Comparación Modelos")
+writeData(wb, "Comparación Modelos", criterios_df)
+
+# Guardar archivo
+saveWorkbook(wb, file = "criterios_modelos_familias.xlsx", overwrite = TRUE)
+
+
+
+#############################################
+
+# Paquetes necesarios
+library(openxlsx)
+library(purrr)
+library(dplyr)
+library(tibble)
+
+# 1. Extraer covariables desde formula_rw
+# Omitimos el offset
+terms_formula <- terms(formula_rw)
+all_vars <- attr(terms_formula, "term.labels")
+covariables <- all_vars[!grepl("offset", all_vars)]  # eliminamos offset
+
+# 2. Crear combinaciones de 1, 2,  3 covariables
+combinaciones <- unlist(
+  lapply(1:5, function(i) combn(covariables, i, simplify = FALSE)),
+  recursive = FALSE
+)
+
+# 3. Función para obtener métricas
+obtener_metricas <- function(vars, data, shapefile_in, W, fam = "Nbinomial", tstruct = "rw2") {
+  fmla_str <- paste("cases ~", paste(vars, collapse = " + "), "+ offset(log(E))")
+  fmla <- as.formula(fmla_str)
+  
+  tryCatch({
+    modelo <- Bcartime(
+      formula = fmla,
+      data = shapefile_in,
+      scol = "idarea",
+      tcol = "idtime",
+      W = W,
+      model = c("bym2", tstruct),
+      family = fam,
+      package = "INLA"
+    )
+    
+    # División de datos
+    set.seed(123)
+    n <- nrow(shapefile_in)
+    train_index <- sample(seq_len(n), size = floor(0.8 * n))
+    test_data <- shapefile_in[-train_index, ]
+    
+    fixed_effects <- modelo$fit$summary.fixed$mean
+    names(fixed_effects) <- rownames(modelo$fit$summary.fixed)
+    
+    pred <- fixed_effects["(Intercept)"] + log(test_data$E)
+    for (var in vars) {
+      pred <- pred + fixed_effects[var] * test_data[[var]]
+    }
+    pred <- exp(pred)
+    
+    obs <- test_data$cases
+    intervalos <- modelo$fit$summary.fitted.values[-train_index, ]
+    lower <- exp(intervalos$`0.025quant`)
+    upper <- exp(intervalos$`0.975quant`)
+    cvg <- mean(obs >= lower & obs <= upper, na.rm = TRUE)
+    
+    rmse <- sqrt(mean((obs - pred)^2, na.rm = TRUE))
+    mae <- mean(abs(obs - pred), na.rm = TRUE)
+    crps <- mean(crps_norm(obs, mean = pred, sd = rep(1, length(pred))), na.rm = TRUE)
+    
+    return(data.frame(
+      covariables = paste(vars, collapse = " + "),
+      RMSE = round(rmse, 3),
+      MAE = round(mae, 3),
+      CRPS = round(crps, 3),
+      CVG = round(cvg, 3)
+    ))
+  }, error = function(e) {
+    return(data.frame(
+      covariables = paste(vars, collapse = " + "),
+      RMSE = NA,
+      MAE = NA,
+      CRPS = NA,
+      CVG = NA
+    ))
+  })
+}
+
+# 4. Ejecutar en todas las combinaciones (usa shapefile_m, W_dense ya definidos)
+resultados_combinaciones <- map_dfr(combinaciones, ~ obtener_metricas(.x, shapefile_m, shapefile_m, W_dense))
+
+# 5. Cargar el archivo Excel existente y agregar nueva hoja
+wb <- loadWorkbook("Resultados_Modelo_Nbinomial_11072025_ar1.xlsx")
+addWorksheet(wb, "Comparaciones Covariables")
+writeData(wb, sheet = "Comparaciones Covariables", resultados_combinaciones)
+
+# 6. Guardar con la hoja añadida
+saveWorkbook(wb, file = "Resultados_Modelo_Nbinomial_11072025_ar1.xlsx", overwrite = TRUE)
+
+
+########################################################################################################
+
+####Creacion de mapas de RR
+
+shapefile <- st_read("recorte_zmvm.shp")
+
+###############################################################################
+library(ggplot2)
+library(dplyr)
+library(sf)
+library(ggrepel)
+
+# Centroides con coordenadas
+centroides <- shapefile_TCR %>%
+  st_centroid(of_largest_polygon = TRUE) %>%
+  cbind(st_coordinates(.))
+
+# Seleccionar todos los de aumento
+centros_aumento <- centroides %>%
+  filter(tendencia == "Aumento")
+
+# Seleccionar los 5 con mayor reducción (menor TCR entre los de Disminución)
+centros_reduccion <- centroides %>%
+  filter(tendencia == "Disminución") %>%
+  arrange(TCR) %>%
+  slice_head(n = 5)
+
+# Unir ambos grupos
+centroides_etiquetados <- bind_rows(centros_aumento, centros_reduccion)
+
+# Mapa
+mapa_TCR <- ggplot(shapefile_TCR) +
+  geom_sf(aes(fill = TCR), color = NA) +
+  geom_text_repel(
+    data = centroides_etiquetados,
+    aes(X, Y, label = nomgeo),
+    size = 2.5,
+    color = "black",
+    max.overlaps = 20,
+    segment.size = 0.2,
+    segment.color = "grey50"
+  ) +
+  scale_fill_distiller(
+    palette = "YlOrRd",
+    direction = 1,
+    name = "Tasa de Cambio (%)"
+  ) +
+  labs(
+    title = "Tasa de Cambio Relativa del Riesgo Relativo (2018–2022)",
+    subtitle = "Se etiquetan todos los municipios con aumento y los 5 con mayor disminución",
+    caption = "Colores: Amarillo (disminuye), Rojo (aumenta)"
+  ) +
+  theme_minimal() +
+  coord_sf(expand = FALSE)
+
+print(mapa_TCR)
+
+
+
+## 2. Mapa Tendencia (clasificación)
+mapa_tendencia <- ggplot(shapefile_TCR) +
+  geom_sf(aes(fill = tendencia), color = NA) +
+  geom_text_repel(
+    data = centroides,
+    aes(X, Y, label = nomgeo),
+    size = 2.5,
+    color = "black",
+    max.overlaps = 20,
+    segment.size = 0.2,
+    segment.color = "grey50"
+  ) +
+  scale_fill_manual(
+    values = c(
+      "Disminución" = "#FD8D3C",  # naranja medio
+      "Estable"     = "#FFFFB2",  # amarillo claro
+      "Aumento"     = "#BD0026"   # rojo oscuro
+    ),
+    name = "Tendencia"
+  ) +
+  labs(
+    title = "Tendencia del Riesgo Relativo (2018–2022)",
+    subtitle = "Aumento, Disminución o Estabilidad entre años extremos",
+    caption = "Clasificación basada en TCR (>10%, <-10%, entre ±10%)"
+  ) +
+  theme_minimal() +
+  coord_sf(expand = FALSE)
+print(mapa_tendencia)
+
+
+## 3. Mapas por Año (con facetas)
+
+
+
+library(ggplot2)
+library(dplyr)
+library(sf)
+library(ggrepel)
+
+mapas_por_anio <- shapefile_m %>%
+  filter(fecha %in% 2018:2022) %>%
+  mutate(fecha = factor(fecha))
+
+centroides_anuales <- mapas_por_anio %>%
+  group_by(fecha, nomgeo) %>%
+  summarise(geometry = st_centroid(geometry)) %>% 
+  cbind(st_coordinates(.)) %>%
+  ungroup()
+
+mapa_tasa_cruda <- ggplot(mapas_por_anio) +
+  geom_sf(aes(fill = tasa_cruda), color = NA) +
+  geom_text_repel(
+    data = centroides_anuales,
+    aes(X, Y, label = nomgeo),
+    size = 2,
+    color = "black",
+    fontface = "bold",
+    max.overlaps = 10,
+    segment.size = 0.15,
+    segment.color = "grey70"
+  ) +
+  scale_fill_distiller(
+    palette = "YlOrRd",
+    direction = 1,
+    name = "Tasa Cruda"
+  ) +
+  facet_wrap(~fecha, ncol = 3) +
+  labs(
+    title = "Tasa Cruda por Municipio (2018–2022)",
+    subtitle = "Mapas anuales",
+    caption = "Escala continua de Tasa Cruda"
+  ) +
+  theme_minimal() +
+  coord_sf(expand = FALSE)
+
+print(mapa_tasa_cruda)
+
+
+####mapa de RR correcto
+# Filtrar centroides solo para los municipios con RR > 2
+centroides_anuales <- mapas_por_anio %>%
+  st_centroid(of_largest_polygon = TRUE) %>%
+  cbind(st_coordinates(.)) %>%
+  select(cvegeo, nomgeo, fecha, X, Y)  # Incluye columnas necesarias
+centroides_etiquetados <- centroides_anuales %>%
+  left_join(mapas_por_anio %>% st_drop_geometry() %>% select(cvegeo, fecha, RR_corrected),
+            by = c("cvegeo", "fecha")) %>%
+  filter(RR_corrected > 2)
+
+
+# Mapa con etiquetas solo para RR > 2
+mapa_RR_corrected <- ggplot(mapas_por_anio) +
+  geom_sf(aes(fill = RR_corrected), color = NA) +
+  geom_text_repel(
+    data = centroides_etiquetados,
+    aes(X, Y, label = nomgeo),
+    size = 2,
+    color = "black",
+    fontface = "bold",
+    max.overlaps = 4,
+    segment.size = 0.15,
+    segment.color = "grey70"
+  ) +
+  scale_fill_distiller(
+    palette = "YlOrRd",
+    direction = 1,
+    name = "Riesgo Relativo (RR)"
+  ) +
+  facet_wrap(~fecha, ncol = 3) +
+  labs(
+    title = "Riesgo Relativo por Municipio (2018–2022)",
+    subtitle = "Etiquetas solo para RR > 2",
+    caption = "Escala continua de RR estimado"
+  ) +
+  theme_minimal() +
+  coord_sf(expand = FALSE)
+
+print(mapa_RR_corrected)
+
+
+
+
+# Guardar los cuatro mapas en imágenes PNG
+ggsave("mapa_TCR.png", mapa_TCR, width = 10, height = 8, dpi = 300)
+ggsave("mapa_tendencia.png", mapa_tendencia, width = 10, height = 8, dpi = 300)
+ggsave("mapa_tasa_cruda.png", mapa_tasa_cruda, width = 12, height = 8, dpi = 300)
+ggsave("mapa_RR_corrected2.png", mapa_RR_corrected, width = 12, height = 8, dpi = 300)
+
+
+
+################################################################################
