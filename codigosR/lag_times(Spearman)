@@ -1,0 +1,321 @@
+#paqueteria
+library(tidyverse)
+library(lubridate)
+library(zoo)
+library(ggthemes)
+library(ggpubr)
+library(scales)
+
+setwd('C:/Users/Jesus Emmanuel/Desktop/Proyecto_final_esp/Zonas_industriales/DENUE/datos')
+# Leer datos
+df <- read.csv('C:/Users/Jesus Emmanuel/Downloads/panel_diario.csv')
+
+# Convertir fecha correctamente
+df$fecha <- dmy(df$fecha)
+
+# Crear función para calcular correlaciones con desfase usando Spearman
+detectar_lags <- function(data, enfermedad, contaminante, max_lag = 8) {
+  map_dfr(0:max_lag, function(lag_dias) {
+    data_lag <- data %>%
+      mutate(valor_lag = lag(get(contaminante), lag_dias))
+    
+    cor_valor <- suppressWarnings(
+      cor(data_lag[[enfermedad]], data_lag$valor_lag, method = "spearman", use = "complete.obs")
+    )
+    
+    tibble( 
+      enfermedad = enfermedad,
+      contaminante = contaminante,
+      lag = lag_dias,
+      correlacion = cor_valor,
+      anio = unique(data$anio)
+    )
+  })
+}
+
+# Definir enfermedades y contaminantes
+enfermedades <- c("J029", "J189", "J209", "J441", "J459")
+contaminantes <- c("NO2", "PM10", "PM25", "RH", "TMP")
+
+# Obtener resultados por año
+df_resultados <- df %>%
+  group_by(anio) %>%
+  group_split() %>%
+  map_dfr(function(anio_df) {
+    map_dfr(enfermedades, function(enf) {
+      map_dfr(contaminantes, function(cont) {
+        detectar_lags(anio_df, enf, cont)
+      })
+    })
+  })
+
+# Identificar lags con máxima correlación absoluta
+df_maximos <- df_resultados %>%
+  group_by(anio, enfermedad, contaminante) %>%
+  slice_max(order_by = abs(correlacion), n = 1, with_ties = FALSE) %>%
+  ungroup()
+
+# Graficar: un facet por enfermedad y año
+p <- ggplot(df_resultados, aes(x = lag, y = correlacion, color = contaminante)) +
+  geom_line() +
+  geom_point(data = df_maximos, aes(x = lag, y = correlacion), size = 2, shape = 21, fill = "white") +
+  facet_grid(anio ~ enfermedad) +
+  geom_vline(data = df_maximos, aes(xintercept = lag, color = contaminante), linetype = "dashed") +
+  labs(title = "Correlaciones por desfase (lag) entre enfermedades y contaminantes",
+       x = "Desfase en días (lag)", y = "Coeficiente de correlación",
+       color = "Contaminante") +
+  theme_minimal(base_size = 12) +
+  theme(strip.text = element_text(face = "bold"))
+
+ggsave(
+  filename = "correlacion_lagtimes_spearman.jpg",
+  plot     = p,
+  device   = "jpeg",
+  width    = 12,      # ancho en pulgadas
+  height   = 8,       # alto en pulgadas
+  units    = "in",    # unidades de width/height
+  dpi      = 300      # resolución en puntos por pulgada
+)
+
+######################################################################################################
+
+# Crear tabla final 
+resumen_tabla <- df_maximos %>%
+  arrange(anio, enfermedad, contaminante) %>%
+  select(anio, enfermedad, contaminante, lag, correlacion)
+
+
+print(resumen_tabla, n = 25)
+
+# Opcional: guardar la tabla en CSV para análisis posterior
+write_csv(resumen_tabla, "correlaciones_maximas_spearman.csv")
+
+getwd()
+##################################################################################################
+
+library(tidyverse)
+
+# Leer archivo
+df <- read.csv("C:/Users/Jesus Emmanuel/Desktop/Proyecto_final_esp/Zonas_industriales/DENUE/datos/correlaciones_maximas_spearman.csv")
+
+str(df)
+
+
+df <- df %>%
+  mutate(
+    lag = as.integer(lag),
+    correlacion = as.numeric(correlacion)
+  )
+
+# Obtener el lag con mayor correlación (absoluta) por enfermedad, contaminante y año
+resumen_lags <- df %>%
+  group_by(enfermedad, contaminante, anio) %>%
+  filter(abs(correlacion) == max(abs(correlacion), na.rm = TRUE)) %>%
+  ungroup()
+
+# Mostrar resumen agrupado por enfermedad y contaminante
+resumen_final <- resumen_lags %>%
+  group_by(enfermedad, contaminante) %>%
+  summarise(
+    lags_mas_frecuentes = paste0("Lag ", names(sort(table(lag), decreasing = TRUE)[1:min(3, length(unique(lag)))]), collapse = ", "),
+    correlacion_prom = round(mean(correlacion, na.rm = TRUE), 3),
+    correlacion_max = round(max(correlacion, na.rm = TRUE), 3),
+    correlacion_min = round(min(correlacion, na.rm = TRUE), 3),
+    .groups = "drop"
+  )
+
+
+print(resumen_final, n = Inf)
+
+
+###############################################################################
+
+library(tidyverse)
+
+
+df <- read.csv("C:/Users/Jesus Emmanuel/Desktop/Proyecto_final_esp/Zonas_industriales/DENUE/datos/correlaciones_maximas_spearman.csv")
+
+
+
+if (!"lag" %in% names(df)) {
+  long_df <- df %>%
+    pivot_longer(cols = -c(enfermedad, anio),
+                 names_to = "var_lag",
+                 values_to = "correlacion") %>%
+    filter(str_detect(var_lag, "_lag\\d+")) %>%
+    mutate(
+      contaminante = str_extract(var_lag, "^[^_]+"),
+      lag = parse_number(var_lag)
+    ) %>%
+    select(enfermedad, anio, contaminante, lag, correlacion)
+} else {
+  long_df <- df
+}
+
+# Extraer el lag con mayor correlación absoluta por año, enfermedad y contaminante
+resumen_lags <- long_df %>%
+  group_by(enfermedad, contaminante, anio) %>%
+  filter(abs(correlacion) == max(abs(correlacion), na.rm = TRUE)) %>%
+  ungroup()
+
+# Ver consistencia de lags por enfermedad y contaminante
+consistencia_lags <- resumen_lags %>%
+  group_by(enfermedad, contaminante, lag) %>%
+  summarise(
+    veces_repetido = n(),
+    correlacion_prom = round(mean(correlacion, na.rm = TRUE), 3),
+    .groups = "drop"
+  ) %>%
+  arrange(enfermedad, contaminante, desc(veces_repetido))
+
+# Mostrar la moda del lag por combinación enfermedad-contaminante
+moda_lags <- resumen_lags %>%
+  group_by(enfermedad, contaminante) %>%
+  summarise(
+    lag_mas_frecuente = lag[which.max(tabulate(match(lag, lag)))],
+    veces_repetido = max(tabulate(match(lag, lag))),
+    lags_observados = paste(sort(unique(lag)), collapse = ", "),
+    .groups = "drop"
+  )
+
+
+print("Resumen de consistencia de lags:")
+print(consistencia_lags)
+
+print("Moda de lags por enfermedad y contaminante:")
+print(moda_lags)
+
+
+####################################################################################
+
+########################################################################################
+
+# Calcular p-value para cada correlación máxima
+
+
+df_diario <- read_csv('C:/Users/Jesus Emmanuel/Downloads/panel_diario.csv')  # este sí debe tener 'fecha', 'anio', y columnas de enfermedades y contaminantes
+
+df_lags <- df_resultados
+
+
+df_significancia <- df_diario %>%
+  select(fecha, anio, all_of(c(enfermedades, contaminantes)))
+
+
+
+df_significancia <- df_significancia %>%
+  select(fecha, anio, all_of(c(enfermedades, contaminantes)))
+
+# Función para obtener p-value para cada combinación
+obtener_pvalores <- function(fila, df_lags) {
+  sub_df <- df_lags %>%
+    filter(
+      anio == fila$anio,
+      enfermedad == fila$enfermedad,
+      contaminante == fila$contaminante
+    )
+  
+  if (nrow(sub_df) < 3) {
+    return(tibble(p_value = NA))
+  }
+  
+  t_test <- t.test(sub_df$correlacion, mu = 0)
+  return(tibble(p_value = t_test$p.value))
+}
+
+
+df_maximos_con_p <- df_maximos %>%
+  rowwise() %>%
+  mutate(
+    p_value = obtener_pvalores(cur_data(), df_lags)$p_value
+  ) %>%
+  ungroup() %>%
+  mutate(
+    p_ajustada = p.adjust(p_value, method = "fdr"),
+    significativa = p_ajustada < 0.05
+  )
+
+
+
+print("Correlaciones con valor-p:")
+print(df_maximos_con_p, n = 20)
+
+# Guardar resultados 
+write_csv(df_maximos_con_p, "correlaciones_significativas_spearman.csv")
+
+
+
+#################################################################################
+
+setwd('C:/Users/Jesus Emmanuel/Desktop/Proyecto_final_esp/Zonas_industriales/DENUE/datos')
+
+
+library(tidyverse)
+
+
+df <- read_csv("correlaciones_significativas_spearman.csv")
+
+
+glimpse(df)
+
+# Generar una columna interpretada
+df_resumen <- df %>%
+  mutate(
+    correlacion_texto = case_when(
+      correlacion > 0 ~ paste0(round(correlacion, 4), " (positiva)"),
+      correlacion < 0 ~ paste0(round(correlacion, 4), " (negativa)"),
+      TRUE ~ paste0(round(correlacion, 4), " (nula)")
+    ),
+    significativa_texto = ifelse(significativa, "✅ Sí", "❌ No"),
+    interpretacion = paste0(
+      "Enfermedad: ", enfermedad, "\n",
+      "Contaminante: ", contaminante, "\n",
+      "Año: ", anio, "\n",
+      "Lag: ", lag, " días\n",
+      "Correlación: ", correlacion_texto, "\n",
+      "p_value: ", signif(p_value, 4), "\n",
+      "p_ajustada: ", signif(p_ajustada, 4), "\n",
+      "¿Significativa? ", significativa_texto, "\n\n",
+      ifelse(significativa,
+             paste0("🔎 Esto sugiere que el aumento en ", contaminante,
+                    " se asocia con un cambio en casos de ", enfermedad,
+                    " con un retraso de ", lag, " días, y esta relación es estadísticamente significativa."),
+             paste0("⚠️ No se encontró evidencia estadísticamente significativa entre ", contaminante,
+                    " y ", enfermedad, " en este año."))
+    )
+  )
+
+
+cat(paste(df_resumen$interpretacion, collapse = "\n\n---\n\n"))
+
+
+write_lines(df_resumen$interpretacion, "resumen_interpretado_spearman.txt")
+
+
+library(tidyverse)
+
+
+df <- read_csv("correlaciones_significativas_spearman.csv")
+
+# Filtrar solo las correlaciones significativas
+df_significativas <- df %>%
+  filter(significativa == TRUE)
+
+# Crear tabla resumida agrupando por año y enfermedad
+tabla_resumen <- df_significativas %>%
+  arrange(anio, enfermedad, contaminante) %>%
+  group_by(anio, enfermedad) %>%
+  summarise(
+    resumen = paste0(
+      contaminante, ": ",
+      "r = ", round(correlacion, 3), 
+      ", lag = ", lag, " días"
+    ) %>% paste(collapse = " | "),
+    .groups = "drop"
+  )
+
+
+print(tabla_resumen, n = Inf)
+
+# Guardar 
+write_csv(tabla_resumen, "tabla_correlaciones_significativas_spearman.csv")
