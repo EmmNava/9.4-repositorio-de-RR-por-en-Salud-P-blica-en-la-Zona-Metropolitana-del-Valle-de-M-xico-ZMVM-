@@ -1,0 +1,50 @@
+# Archivos y carpetas de R
+.Rhistory
+.RData
+.Rproj.user/
+.Ruserdata
+.Rapp.history
+
+# Proyectos de RStudio
+*.Rproj
+
+# Datos crudos o sensibles (ajusta según tu estructura)
+data/raw/
+data/*.csv
+data/*.xlsx
+data/*.txt
+
+# Resultados grandes o generados
+results/
+maps/
+*.pdf
+*.png
+*.jpg
+
+# Bases GeoJSON, Shapefiles temporales
+*.geojson
+*.shp
+*.dbf
+*.shx
+*.prj
+*.cpg
+
+# Archivos generados por paquetes
+.DS_Store
+*.utf8.md
+*.knit.md
+*.log
+
+# Scripts temporales o de prueba
+*_temp.R
+*test*.R
+
+# Archivos de bases espaciales
+*.gpkg
+*.sqlite
+*.gdb
+
+# Otros
+*.bak
+*.zip
+*.tar.gz
