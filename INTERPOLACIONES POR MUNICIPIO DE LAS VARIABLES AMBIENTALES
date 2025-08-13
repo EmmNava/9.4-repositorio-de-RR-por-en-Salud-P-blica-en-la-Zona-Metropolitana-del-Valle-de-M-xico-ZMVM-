@@ -1,0 +1,421 @@
+#CODIGO PARA OBTENER LAS INTERPOLACIONES POR MUNICIPIO DE LAS VARIABLES AMBIENTALES, LOS VALORES SE AJUSTAN DE ACUERDO A LA VARIABLE.
+
+# Lee y transforma la capa de municipios de la ZMVM
+limite_zmvm <-
+  st_read("/Volumes/KARLA/recorte_zmvm.shp") %>% 
+  st_make_valid() %>% # Corrige errores de geometría
+  st_union() %>% 
+  ms_simplify(keep_shapes = TRUE) %>% 
+  st_transform(6372) # Transforma a coordenadas proyectadas
+
+# Visualiza en un mapa
+tmap_mode("view")
+qtm(limite_zmvm)        
+
+# Definir el número de celdas en las direcciones X e Y
+celdas_x <- 200
+celdas_y <- 200
+
+# Crear la grilla de la CDMX
+grilla_zmvm <-
+  limite_zmvm %>%
+  # Generar una grilla con el número especificado de celdas en cada dirección
+  st_make_grid(n = c(celdas_x, celdas_y)) %>%
+  # Convertir cada celda de la grilla en un punto (el centroide de cada celda)
+  st_centroid() %>%
+  # Convertir el objeto de grilla en un objeto sf
+  st_as_sf() %>%
+  # Filtrar los puntos para quedarse solo con los que están dentro del límite de la CDMX
+  st_filter(limite_zmvm)
+
+# Visualizar la grilla de la CDMX usando tmap
+grilla_zmvm %>%
+  tm_shape() +
+  # Añadir los puntos de la grilla al mapa como puntos (dots)
+  tm_dots()            
+
+
+# Leer la capa de estaciones
+estaciones <- 
+  st_read("datos/estaciones_aire_cdmx.gpkg") %>% 
+  st_transform(6372) %>% # Transforma a coordenadas proyectadas
+  glimpse() # Visualiza los datos           
+
+
+datos_meteorologicos <-
+  read_excel("datos/datos/2018NO2.xls") %>% 
+  clean_names() %>% # Limpia los nombres de variables
+  glimpse() # Visualiza los datos                                       
+
+
+# Transformar los datos de temperatura
+datos_meteorologicos_media <-
+  datos_meteorologicos %>% 
+  pivot_longer(aco:xal,
+               names_to = "clave",
+               values_to = "valor") %>% # Pivotear
+  mutate(clave = str_to_upper(clave),
+         valor = if_else(valor == -99, NA_real_, valor)) %>% # Sustituir -99 por NA
+  group_by(clave) %>% # Agrupar por clave de estación
+  summarize(NO2_media = mean(valor, na.rm = TRUE)) %>% # Resumir medias por estación
+  ungroup() %>% # Desagrupar
+  glimpse() # Visualizar los datos transformados       
+
+
+#solo para el caso de NO2 porque contiene numeros 0 
+
+#library(dplyr) #Limpiar 0, año 2021
+
+#datos_meteorologicos_media <- datos_meteorologicos_media %>%
+#  mutate(NO2_media = if_else(NO2_media == 0, NA_real_, NO2_media))
+
+
+# Obtener estadísticos temperaturas medias del año
+datos_meteorologicos_media %>% 
+  pull(NO2_media) %>% # Extrae la columna de temperatura
+  summary(na.rm = TRUE) # Obtén el rango omitiendo los NA   
+
+
+# Agrega datos de temperatura a estaciones
+estaciones_con_media <-
+  estaciones %>% 
+  select(clave) %>% # Quedarse con la clave de estaciones
+  left_join(datos_meteorologicos_media, by = "clave") %>% # Unir a la capa por "clave"
+  filter(!is.na(NO2_media)) %>% 
+  glimpse() # Visualiza el resultado
+
+
+#los valores se ajustan de acuerdo a cada variable por año, debido a la base de datos
+library(tmap)
+
+tm_shape(estaciones_con_media) +
+  tm_dots(
+    col = "NO2_media",
+    size = ("NO2_media"),
+    palette = "Reds",
+    breaks = c(5, 10, 15, 20, 25, 30, 35),
+    title = "NO2_2018 Media"  # solo una vez
+  ) +
+  tm_layout(legend.outside = TRUE)
+
+
+#############CALCULO PARA ESTABLECER EL TIPO DE INTERPOLACIÓN
+# ================================
+# RMSE DE INTERPOLACIONES: Voronoi, IDW y Kriging
+# ================================
+
+# Cargar librerías necesarias
+library(sf)
+library(dplyr)
+library(purrr)
+library(gstat)
+
+# ----------------
+# 1. Voronoi
+# ----------------
+calcular_rmse_voronoi <- function(estaciones_sf) {
+  errores <- map_dbl(1:nrow(estaciones_sf), function(i) {
+    test <- estaciones_sf[i, ]
+    train <- estaciones_sf[-i, ]
+    
+    vor <- st_union(train) %>%
+      st_voronoi() %>%
+      st_collection_extract("POLYGON") %>%
+      st_as_sf() %>%
+      st_join(train)
+    
+    predicho <- st_join(test, vor, join = st_within)
+    
+    (predicho$NO2_media.y - predicho$NO2_media.x)^2
+  })
+  
+  sqrt(mean(errores, na.rm = TRUE))
+}
+
+# ----------------
+# 2. IDW
+# ----------------
+calcular_rmse_idw <- function(estaciones_sf) {
+  errores <- map_dbl(1:nrow(estaciones_sf), function(i) {
+    test <- estaciones_sf[i, ]
+    train <- estaciones_sf[-i, ]
+    
+    modelo_idw <- gstat::gstat(
+      formula = NO2_media ~ 1,
+      locations = train,
+      nmax = 8,
+      set = list(idp = 2.0)
+    )
+    
+    pred <- predict(modelo_idw, test)
+    
+    (pred$var1.pred - test$NO2_media)^2
+  })
+  
+  sqrt(mean(errores, na.rm = TRUE))
+}
+
+
+
+
+# ----------------
+# 3. Kriging con selección de mejor modelo
+# ----------------
+calcular_rmse_kriging <- function(estaciones_sf) {
+  modelos_posibles <- c("Sph", "Exp", "Gau", "Mat")
+  
+  errores <- map_dbl(1:nrow(estaciones_sf), function(i) {
+    test <- estaciones_sf[i, ]
+    train <- estaciones_sf[-i, ]
+    
+    vgm_emp <- variogram(NO2_media ~ 1, data = train)
+    
+    ajustes <- map(modelos_posibles, function(m) {
+      tryCatch({
+        vgm_ajustado <- fit.variogram(vgm_emp, model = vgm(model = m))
+        list(modelo = m, ajuste = vgm_ajustado, error = attr(vgm_ajustado, "SSErr"))
+      }, error = function(e) NULL)
+    }) %>% compact()
+    
+    if (length(ajustes) == 0) {
+      message(paste("No se pudo ajustar ningún modelo para fold", i))
+      return(NA_real_)
+    }
+    
+    mejor <- reduce(ajustes, function(a, b) if (a$error < b$error) a else b)
+    
+    modelo_kriging <- gstat(
+      formula = NO2_media ~ 1,
+      locations = train,
+      model = mejor$ajuste
+    )
+    
+    pred <- predict(modelo_kriging, test)
+    
+    (pred$var1.pred - test$NO2_media)^2
+  })
+  
+  # Calcular el mejor modelo para todo el dataset, para imprimir luego
+  vgm_emp_total <- variogram(NO2_media ~ 1, data = estaciones_sf)
+  ajustes_total <- map(modelos_posibles, function(m) {
+    tryCatch({
+      vgm_ajustado <- fit.variogram(vgm_emp_total, model = vgm(model = m))
+      list(modelo = m, ajuste = vgm_ajustado, error = attr(vgm_ajustado, "SSErr"))
+    }, error = function(e) NULL)
+  }) %>% compact()
+  
+  mejor_total <- reduce(ajustes_total, function(a, b) if (a$error < b$error) a else b)
+  
+  list(
+    rmse = sqrt(mean(errores, na.rm = TRUE)),
+    mejor_modelo = mejor_total$modelo
+  )
+}
+
+# ----------------
+# 4. Ejecutar y comparar
+# ----------------
+resultado_kriging <- calcular_rmse_kriging(estaciones_con_media)
+rmse_kriging <- resultado_kriging$rmse
+mejor_modelo_kriging <- resultado_kriging$mejor_modelo
+
+rmse_voronoi <- calcular_rmse_voronoi(estaciones_con_media)
+rmse_idw <- calcular_rmse_idw(estaciones_con_media)
+
+# Mostrar resultados comparativos
+data.frame(
+  Metodo = c("Voronoi", "IDW", "Kriging"),
+  RMSE = c(rmse_voronoi, rmse_idw, rmse_kriging)
+) %>%
+  arrange(RMSE) %>%
+  print()
+
+# Imprimir el mejor modelo para kriging
+cat("El mejor modelo de variograma para Kriging es:", mejor_modelo_kriging, "\n")
+
+
+
+
+################################
+#INTERPOLACIÓN IDW PARA PM10 Y PM2.5
+
+# Definir fórmula
+idw_formula <- estaciones_con_media$PM25_media ~ 1
+
+# Crear el modelo IDW
+interpolacion_idw <- idw(formula = idw_formula, 
+                         locations = estaciones_con_media, 
+                         newdata = grilla_zmvm, 
+                         idp = 2 # Parámetro del orden (potencia)
+)
+
+# Visualizar el resultado de la interpolación
+interpolacion_idw
+
+
+# Agregar las predicciones a la grilla de predicciones
+grilla_zmvm$pred_idw <- interpolacion_idw$var1.pred
+
+# Convertir la grilla de puntos con predicciones a raster
+interpolacion_idw_raster <- st_rasterize(grilla_zmvm["pred_idw"], 
+                                         nx = celdas_x,  
+                                         ny = celdas_y)
+
+tm_shape(interpolacion_idw_raster) +
+  tm_raster(
+    col = "pred_idw",  # nombre correcto
+    palette = "Reds",
+    title = "PM25_2018",
+    breaks = c(10, 14, 18, 22, 26, 30)
+  )
+
+# Guardar el raster en un TIFF
+write_stars(interpolacion_idw_raster, "resultados/idw_PM252018.tif")
+
+
+######################################
+#INTERPOLACIÓN KRIGING ORDINARIO PARA NO2, TMP Y RH
+
+# Definir la fórmula del modelo lineal
+kriging_formula <- estaciones_con_media$NO2_media ~ 1
+
+# Calcular el semivariograma a partir de las estaciones
+semivariograma <- variogram(kriging_formula,
+                            data = as(estaciones_con_media, "Spatial"))
+
+# Visualiza el semivariograma
+plot(semivariograma,
+     main = "Semivariograma")
+
+# Selecciona los métodos para probar el mejor ajuste, probar con todos para ver cual tiene el mennor error. 
+modelos_kriging <- "Sph"
+
+# Construye el modelo de la curva de ajuste
+modelo_semivariograma <- fit.variogram(semivariograma,
+                                       model = vgm(modelos_kriging)) 
+
+# Visualiza el semivariograma y la curva de ajuste
+plot(semivariograma, 
+     model = modelo_semivariograma, 
+     main = paste("Semivariograma"))
+
+# Calcular la interpolación para la grilla
+interpolacion_kriging <- krige(kriging_formula,
+                               locations = estaciones_con_media, 
+                               newdata = grilla_zmvm,
+                               model = modelo_semivariograma)
+
+# Guarda los resultados en una nueva columna
+grilla_zmvm$pred_kriging <- interpolacion_kriging$var1.pred
+
+
+# Convertir a Spatial 
+estaciones_sp <- as(estaciones_con_media, "Spatial")
+
+# Filtrar NAs en la variable objetivo
+estaciones_sp <- estaciones_sp[!is.na(estaciones_sp$NO2_media), ]
+
+
+validacion_kriging <- krige.cv(NO2_media ~ 1,
+                               locations = estaciones_sp,
+                               model = modelo_semivariograma)
+
+########CALCULAR EL ERROR 
+# Convertir y filtrar
+estaciones_sp <- as(estaciones_con_media, "Spatial")
+estaciones_sp <- estaciones_sp[!is.na(estaciones_sp$NO2_media), ]
+
+# Validación cruzada
+validacion_kriging <- krige.cv(NO2_media ~ 1,
+                               locations = estaciones_sp,
+                               model = modelo_semivariograma)
+
+# Calcular errores
+validacion_kriging$error <- validacion_kriging$observed - validacion_kriging$var1.pred
+
+# Métricas
+rmse <- sqrt(mean(validacion_kriging$error^2))
+mae <- mean(abs(validacion_kriging$error))
+me  <- mean(validacion_kriging$error)
+
+# Resultados
+print(summary(validacion_kriging))
+cat("RMSE:", rmse, "\nMAE:", mae, "\nME:", me)
+
+
+# Convierte los puntos y sus valores en raster
+interpolacion_kriging_raster <- st_rasterize(grilla_zmvm["pred_kriging"], 
+                                             nx = celdas_x,  
+                                             ny = celdas_y)
+
+
+# Define los cortes
+cortes <- c(5, 10, 15, 20, 25, 30, 35)
+
+# Visualizar el resultado en un mapa con 6 clases
+tm_shape(interpolacion_kriging_raster) +
+  tm_raster(col = "pred_kriging",
+            palette = "Reds", # Puedes usar "Reds" para gradiente rojo o el que prefieras
+            title = "Kriging",
+            style = "fixed",
+            breaks = cortes) +
+  tm_title("NO2 media 2018 (Kriging)")
+
+# Guardar el raster en un TIFF
+write_stars(interpolacion_kriging_raster, "resultados/kriging_NO2_2018.tif")
+
+###OBTENER LA MEDIA POR MUNICIPIO PARA TODAS LAS VARIABLES 
+
+# Cargar librerías necesarias
+library(terra)
+library(sf)
+library(exactextractr)
+library(dplyr)
+
+# Leer raster de interpolación
+raster_kri <- rast("resultados/kriging_NO2_2018.tif")
+
+# Leer shapefile de municipios
+municipios <- st_read("/Volumes/KARLA/recorte_zmvm.shp")
+
+# Asegurarse de que ambos estén en la misma proyección
+municipios <- st_transform(municipios, crs(raster_kri))
+
+# Extraer media por municipio con exactitud
+media_por_municipio <- exact_extract(raster_kri, municipios, 'mean')
+
+
+# Añadir al shapefile
+municipios$media_NO2 <- media_por_municipio
+
+# Mostrar los primeros resultados
+head(municipios[, c("nomgeo", "media_NO2")])
+
+library(tmap)
+tmap_mode("view")  # o "plot" para exportar a PNG
+
+mapa_NO2_2018 <- tm_shape(municipios) +
+  tm_polygons(
+    col = "media_NO2",
+    fill.scale = tm_scale_intervals(
+      breaks = c(10, 15, 20, 25, 30, 35),
+      labels = c("10–15", "15–20", "20–25", "25–30", "30–35")
+    ),
+    fill.legend = tm_legend(title = "NO2 2018"),
+    palette = "YlOrRd"
+  ) +
+  tm_text("nomgeo", size = 0.3, auto.placement = TRUE, remove.overlap = TRUE) +
+  tm_graticules(lines = FALSE) +
+  tm_compass(position = c("left", "top")) +
+  tm_scalebar(position = c("left", "bottom")) +
+  tm_layout(
+    main.title = "Media anual de NO2 - Año 2018",
+    main.title.size = 1.2,
+    main.title.position = "center",
+    legend.outside = TRUE,
+    frame = TRUE,
+    inner.margins = 0.05,
+    outer.margins = 0.1
+  )
+
+mapa_NO2_2018
