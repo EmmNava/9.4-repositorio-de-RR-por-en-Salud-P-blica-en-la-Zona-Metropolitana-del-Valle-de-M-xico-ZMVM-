@@ -33,7 +33,7 @@ library(scoringRules)
 library(tmap)
 
 
-setwd('ruta**')
+setwd('C:/Users/Jesus Emmanuel/Desktop/Proyecto_final_esp/Zonas_industriales/DENUE/datos')
 
 # Municipios
 shapefile <- st_read("recorte_zmvm.shp")
@@ -325,7 +325,6 @@ write.xlsx(data_clean, file = "bayes_final_210725.xlsx", rowNames = FALSE)
 write.csv(data_clean, file = "bayes_final210725.csv", row.names = FALSE)
 
 
-# Especificar la ruta del archivo
 
 st_write(shapefile_m, "bayes_final210725.shp")
 
@@ -506,18 +505,18 @@ criterios_df <- data.frame(
 criterios_df[, -1] <- round(criterios_df[, -1], 3)
 
 
-# Agregar hoja y escribir la tabla
+#
 addWorksheet(wb, "Comparación Modelos")
 writeData(wb, "Comparación Modelos", criterios_df)
 
-# Guardar archivo
+
 saveWorkbook(wb, file = "criterios_modelos_familias.xlsx", overwrite = TRUE)
 
 
 
 #############################################
 
-# Paquetes necesarios
+
 library(openxlsx)
 library(purrr)
 library(dplyr)
