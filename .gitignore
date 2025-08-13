@@ -1,49 +1,51 @@
-# History files
+# Archivos y carpetas de R
 .Rhistory
+.RData
+.Rproj.user/
+.Ruserdata
 .Rapp.history
 
-# Session Data files
-.RData
-.RDataTmp
+# Proyectos de RStudio
+*.Rproj
 
-# User-specific files
-.Ruserdata
+# Datos crudos o sensibles (ajusta según tu estructura)
+data/raw/
+data/*.csv
+data/*.xlsx
+data/*.txt
 
-# Example code in package build process
-*-Ex.R
+# Resultados grandes o generados
+results/
+maps/
+*.pdf
+*.png
+*.jpg
 
-# Output files from R CMD build
-/*.tar.gz
+# Bases GeoJSON, Shapefiles temporales
+*.geojson
+*.shp
+*.dbf
+*.shx
+*.prj
+*.cpg
 
-# Output files from R CMD check
-/*.Rcheck/
-
-# RStudio files
-.Rproj.user/
-
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
-
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
-
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
-
-# Temporary files created by R markdown
+# Archivos generados por paquetes
+.DS_Store
 *.utf8.md
 *.knit.md
+*.log
 
-# R Environment Variables
-.Renviron
+# Scripts temporales o de prueba
+*_temp.R
+*test*.R
 
-# pkgdown site
-docs/
+# Archivos de bases espaciales
+*.gpkg
+*.sqlite
+*.gdb
 
-# translation temp files
-po/*~
+# Otros
+*.bak
+*.zip
+*.tar.gz
 
-# RStudio Connect folder
-rsconnect/
