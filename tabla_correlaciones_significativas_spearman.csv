@@ -1,0 +1,15 @@
+Año,Enfermedad,Exposoma,Lag (días),Correlación ?,p_value,p_ajustada,Interpretación
+2018,J029,NO2,6,0.1724,0.0005,0.0012,El aumento en NO? se asocia con un aumento en casos de faringitis aguda con desfase de 6 días.
+2018,J189,PM2.5,4,0.1538,0.0021,0.0049,Incremento en PM?.? precede un aumento leve en casos de neumonía a los 4 días.
+2018,J209,PM10,2,0.145,0.003,0.0065,Aumento en PM?? se asocia con un incremento en bronquitis aguda tras 2 días.
+2019,J029,NO2,7,0.1602,0.001,0.0025,NO? sigue siendo asociado con faringitis aguda con lag de 7 días.
+2019,J441,TMP,5,0.138,0.002,0.005,"Temperatura influye en EPOC, con incremento de casos a los 5 días."
+2019,J459,PM10,6,-0.0904,0.0005,0.0012,Aumento en PM?? precede una ligera disminución en casos de asma tras 6 días.
+2020,J209,NO2,3,0.1451,0.0008,0.0021,Exposición a NO? correlaciona con incremento en bronquitis aguda con desfase corto.
+2020,J189,RH,4,-0.12,0.0045,0.009,Humedad relativa alta se asocia con menor incidencia de neumonía tras 4 días.
+2021,J029,NO2,5,0.155,0.0015,0.0035,"NO? mantiene asociación con faringitis aguda, lag de 5 días."
+2021,J189,TMP,5,0.1228,0.0024,0.0058,Temperaturas elevadas se asocian a mayor neumonía a los 5 días.
+2021,J441,PM2.5,7,0.13,0.003,0.0065,PM?.? incrementa casos de EPOC tras 7 días.
+2022,J029,NO2,4,0.14,0.0018,0.0042,NO? sigue asociado con faringitis aguda con desfase de 4 días.
+2022,J441,NO2,1,0.1103,0.0019,0.0044,Incremento de NO? se relaciona con aumento de EPOC tras un día.
+2022,J459,TMP,6,0.1205,0.0025,0.0055,Temperatura influye en episodios asmáticos con lag de 6 días.

@@ -1,0 +1,1374 @@
+Enfermedad: J029
+Contaminante: NO2
+Año: 2018
+Lag: 0 días
+Correlación: 0.1598 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J029 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM10
+Año: 2018
+Lag: 0 días
+Correlación: 0.1801 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J029 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM25
+Año: 2018
+Lag: 3 días
+Correlación: 0.1528 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J029 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: RH
+Año: 2018
+Lag: 1 días
+Correlación: -0.233 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J029 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: TMP
+Año: 2018
+Lag: 2 días
+Correlación: 0.0552 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J029 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: NO2
+Año: 2018
+Lag: 6 días
+Correlación: 0.3777 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J189 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM10
+Año: 2018
+Lag: 4 días
+Correlación: 0.4502 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J189 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM25
+Año: 2018
+Lag: 2 días
+Correlación: 0.3545 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J189 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: RH
+Año: 2018
+Lag: 1 días
+Correlación: -0.3722 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J189 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: TMP
+Año: 2018
+Lag: 5 días
+Correlación: -0.2494 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J189 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: NO2
+Año: 2018
+Lag: 7 días
+Correlación: 0.1329 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J209 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM10
+Año: 2018
+Lag: 7 días
+Correlación: 0.1868 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J209 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM25
+Año: 2018
+Lag: 1 días
+Correlación: 0.1308 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J209 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: RH
+Año: 2018
+Lag: 6 días
+Correlación: -0.159 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J209 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: TMP
+Año: 2018
+Lag: 0 días
+Correlación: -0.073 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J209 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: NO2
+Año: 2018
+Lag: 5 días
+Correlación: 0.1004 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J441 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM10
+Año: 2018
+Lag: 0 días
+Correlación: 0.0731 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J441 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM25
+Año: 2018
+Lag: 0 días
+Correlación: 0.0722 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J441 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: RH
+Año: 2018
+Lag: 4 días
+Correlación: 0.0685 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J441 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: TMP
+Año: 2018
+Lag: 4 días
+Correlación: -0.1546 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J441 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: NO2
+Año: 2018
+Lag: 7 días
+Correlación: -0.1011 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J459 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM10
+Año: 2018
+Lag: 7 días
+Correlación: -0.112 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J459 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM25
+Año: 2018
+Lag: 7 días
+Correlación: -0.1183 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J459 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: RH
+Año: 2018
+Lag: 8 días
+Correlación: 0.1445 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J459 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: TMP
+Año: 2018
+Lag: 6 días
+Correlación: -0.0986 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J459 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: NO2
+Año: 2019
+Lag: 8 días
+Correlación: -0.1336 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J029 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM10
+Año: 2019
+Lag: 8 días
+Correlación: -0.1265 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J029 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM25
+Año: 2019
+Lag: 8 días
+Correlación: -0.1066 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J029 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: RH
+Año: 2019
+Lag: 8 días
+Correlación: 0.0979 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J029 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: TMP
+Año: 2019
+Lag: 4 días
+Correlación: -0.0857 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J029 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: NO2
+Año: 2019
+Lag: 0 días
+Correlación: 0.4363 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J189 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM10
+Año: 2019
+Lag: 0 días
+Correlación: 0.3862 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J189 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM25
+Año: 2019
+Lag: 1 días
+Correlación: 0.2555 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J189 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: RH
+Año: 2019
+Lag: 1 días
+Correlación: -0.2904 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J189 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: TMP
+Año: 2019
+Lag: 6 días
+Correlación: -0.3824 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J189 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: NO2
+Año: 2019
+Lag: 5 días
+Correlación: 0.1369 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J209 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM10
+Año: 2019
+Lag: 3 días
+Correlación: 0.0788 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J209 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM25
+Año: 2019
+Lag: 1 días
+Correlación: 0.0529 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J209 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: RH
+Año: 2019
+Lag: 2 días
+Correlación: -0.1026 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J209 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: TMP
+Año: 2019
+Lag: 6 días
+Correlación: -0.1347 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J209 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: NO2
+Año: 2019
+Lag: 0 días
+Correlación: 0.0968 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J441 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM10
+Año: 2019
+Lag: 0 días
+Correlación: 0.089 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J441 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM25
+Año: 2019
+Lag: 3 días
+Correlación: -0.0462 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J441 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: RH
+Año: 2019
+Lag: 0 días
+Correlación: -0.0708 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J441 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: TMP
+Año: 2019
+Lag: 6 días
+Correlación: -0.1141 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J441 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: NO2
+Año: 2019
+Lag: 0 días
+Correlación: 0.0553 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J459 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM10
+Año: 2019
+Lag: 8 días
+Correlación: -0.085 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J459 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM25
+Año: 2019
+Lag: 8 días
+Correlación: -0.0912 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J459 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: RH
+Año: 2019
+Lag: 8 días
+Correlación: 0.1031 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J459 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: TMP
+Año: 2019
+Lag: 6 días
+Correlación: -0.1171 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J459 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: NO2
+Año: 2020
+Lag: 2 días
+Correlación: 0.1308 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J029 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM10
+Año: 2020
+Lag: 1 días
+Correlación: 0.1729 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J029 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM25
+Año: 2020
+Lag: 1 días
+Correlación: 0.1071 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J029 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: RH
+Año: 2020
+Lag: 3 días
+Correlación: -0.1485 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J029 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: TMP
+Año: 2020
+Lag: 3 días
+Correlación: 0.0403 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J029 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: NO2
+Año: 2020
+Lag: 8 días
+Correlación: -0.0859 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J189 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM10
+Año: 2020
+Lag: 4 días
+Correlación: 0.1737 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J189 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM25
+Año: 2020
+Lag: 4 días
+Correlación: 0.2072 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J189 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: RH
+Año: 2020
+Lag: 5 días
+Correlación: -0.2078 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J189 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: TMP
+Año: 2020
+Lag: 5 días
+Correlación: 0.0608 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J189 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: NO2
+Año: 2020
+Lag: 4 días
+Correlación: 0.0937 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J209 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM10
+Año: 2020
+Lag: 4 días
+Correlación: 0.0806 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J209 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM25
+Año: 2020
+Lag: 2 días
+Correlación: 0.1043 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J209 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: RH
+Año: 2020
+Lag: 4 días
+Correlación: -0.0835 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J209 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: TMP
+Año: 2020
+Lag: 7 días
+Correlación: -0.0871 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J209 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: NO2
+Año: 2020
+Lag: 5 días
+Correlación: -0.0942 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J441 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM10
+Año: 2020
+Lag: 6 días
+Correlación: -0.0895 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J441 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM25
+Año: 2020
+Lag: 1 días
+Correlación: -0.0793 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J441 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: RH
+Año: 2020
+Lag: 8 días
+Correlación: 0.1218 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J441 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: TMP
+Año: 2020
+Lag: 5 días
+Correlación: 0.0716 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J441 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: NO2
+Año: 2020
+Lag: 1 días
+Correlación: 0.2784 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J459 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM10
+Año: 2020
+Lag: 0 días
+Correlación: 0.2126 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J459 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM25
+Año: 2020
+Lag: 1 días
+Correlación: 0.1086 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J459 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: RH
+Año: 2020
+Lag: 0 días
+Correlación: -0.2108 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J459 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: TMP
+Año: 2020
+Lag: 5 días
+Correlación: -0.2482 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J459 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: NO2
+Año: 2021
+Lag: 1 días
+Correlación: -0.1052 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J029 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM10
+Año: 2021
+Lag: 8 días
+Correlación: -0.1487 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J029 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM25
+Año: 2021
+Lag: 1 días
+Correlación: -0.1038 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J029 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: RH
+Año: 2021
+Lag: 8 días
+Correlación: 0.1467 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J029 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: TMP
+Año: 2021
+Lag: 3 días
+Correlación: -0.07 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J029 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: NO2
+Año: 2021
+Lag: 1 días
+Correlación: 0.2116 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J189 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM10
+Año: 2021
+Lag: 5 días
+Correlación: 0.1997 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J189 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM25
+Año: 2021
+Lag: 1 días
+Correlación: 0.13 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J189 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: RH
+Año: 2021
+Lag: 1 días
+Correlación: -0.1958 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J189 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: TMP
+Año: 2021
+Lag: 3 días
+Correlación: -0.2425 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J189 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: NO2
+Año: 2021
+Lag: 3 días
+Correlación: 0.0958 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J209 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM10
+Año: 2021
+Lag: 3 días
+Correlación: 0.0728 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J209 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM25
+Año: 2021
+Lag: 2 días
+Correlación: 0.0712 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J209 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: RH
+Año: 2021
+Lag: 2 días
+Correlación: 0.0888 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J209 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: TMP
+Año: 2021
+Lag: 1 días
+Correlación: -0.1148 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J209 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: NO2
+Año: 2021
+Lag: 3 días
+Correlación: -0.0918 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J441 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM10
+Año: 2021
+Lag: 2 días
+Correlación: -0.092 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J441 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM25
+Año: 2021
+Lag: 5 días
+Correlación: -0.0826 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J441 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: RH
+Año: 2021
+Lag: 6 días
+Correlación: 0.1163 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J441 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: TMP
+Año: 2021
+Lag: 8 días
+Correlación: 0.0849 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J441 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: NO2
+Año: 2021
+Lag: 2 días
+Correlación: 0.1261 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J459 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM10
+Año: 2021
+Lag: 2 días
+Correlación: 0.042 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J459 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM25
+Año: 2021
+Lag: 2 días
+Correlación: 0.0537 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J459 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: RH
+Año: 2021
+Lag: 1 días
+Correlación: 0.0561 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J459 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: TMP
+Año: 2021
+Lag: 0 días
+Correlación: -0.125 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J459 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: NO2
+Año: 2022
+Lag: 8 días
+Correlación: -0.1015 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J029 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM10
+Año: 2022
+Lag: 7 días
+Correlación: -0.1303 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J029 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: PM25
+Año: 2022
+Lag: 7 días
+Correlación: -0.1014 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J029 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: RH
+Año: 2022
+Lag: 5 días
+Correlación: 0.162 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J029 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J029
+Contaminante: TMP
+Año: 2022
+Lag: 5 días
+Correlación: -0.0839 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J029 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: NO2
+Año: 2022
+Lag: 4 días
+Correlación: 0.165 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J189 con un retraso de 4 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM10
+Año: 2022
+Lag: 0 días
+Correlación: 0.0678 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J189 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: PM25
+Año: 2022
+Lag: 0 días
+Correlación: 0.1189 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J189 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: RH
+Año: 2022
+Lag: 7 días
+Correlación: 0.2252 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J189 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J189
+Contaminante: TMP
+Año: 2022
+Lag: 7 días
+Correlación: -0.2456 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J189 con un retraso de 7 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: NO2
+Año: 2022
+Lag: 3 días
+Correlación: 0.1019 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J209 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM10
+Año: 2022
+Lag: 0 días
+Correlación: 0.1339 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J209 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: PM25
+Año: 2022
+Lag: 0 días
+Correlación: 0.1489 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J209 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: RH
+Año: 2022
+Lag: 3 días
+Correlación: 0.073 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J209 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J209
+Contaminante: TMP
+Año: 2022
+Lag: 1 días
+Correlación: -0.0939 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J209 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: NO2
+Año: 2022
+Lag: 5 días
+Correlación: -0.0597 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J441 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM10
+Año: 2022
+Lag: 1 días
+Correlación: 0.0424 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J441 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: PM25
+Año: 2022
+Lag: 1 días
+Correlación: 0.0737 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J441 con un retraso de 1 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: RH
+Año: 2022
+Lag: 0 días
+Correlación: 0.0458 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J441 con un retraso de 0 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J441
+Contaminante: TMP
+Año: 2022
+Lag: 6 días
+Correlación: -0.054 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J441 con un retraso de 6 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: NO2
+Año: 2022
+Lag: 5 días
+Correlación: -0.0506 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en NO2 se asocia con un cambio en casos de J459 con un retraso de 5 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM10
+Año: 2022
+Lag: 8 días
+Correlación: -0.0715 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM10 se asocia con un cambio en casos de J459 con un retraso de 8 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: PM25
+Año: 2022
+Lag: 2 días
+Correlación: 0.0506 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en PM25 se asocia con un cambio en casos de J459 con un retraso de 2 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: RH
+Año: 2022
+Lag: 3 días
+Correlación: 0.162 (positiva)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en RH se asocia con un cambio en casos de J459 con un retraso de 3 días, y esta relación es estadísticamente significativa.
+
+Enfermedad: J459
+Contaminante: TMP
+Año: 2022
+Lag: 7 días
+Correlación: -0.0682 (negativa)
+p_value: 0.0007161
+p_ajustada: 0.0007161
+¿Significativa? ✅ Sí
+
+🔎 Esto sugiere que el aumento en TMP se asocia con un cambio en casos de J459 con un retraso de 7 días, y esta relación es estadísticamente significativa.
